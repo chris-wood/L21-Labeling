@@ -19,7 +19,7 @@ samples = ""
 alg = ""
 
 if (len(sys.argv) != 5):
-	print "Usage: python Automation.py d1out d2out samples alg"
+	print "Usage: python AutomateLabel.py d1out d2out samples alg"
 else:
 	d1out = sys.argv[1]
 	d2out = sys.argv[2]
@@ -52,6 +52,9 @@ else:
 				try:
 					if (line == "true\n"):
 						labelSpan = True
+						print "delta+1"
+					else:
+						print "delta+2"
 				except:
 					print "uhoh"
 
