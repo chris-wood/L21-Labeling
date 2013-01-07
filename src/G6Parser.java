@@ -75,99 +75,105 @@ public class G6Parser
       		{
       			BufferedReader reader = new BufferedReader(new FileReader(args[0]));
                 
-                // Create our parser
-                G6Parser parser = new G6Parser();
-                
-                // File-name sequence number
-                int fileNumber = 0;
-                
-                // Parse each line in the nauty output file and create an adjacency matrix for each
-                String line = "";
-                while ((line = reader.readLine()) != null)
-                {
-                    System.out.println("Parsing: " + line);
-                    LinkedList<LinkedList<Integer>> list = parser.parseGraph(line);
-                    
-                    // debug
-                    /*
-                    int c = 1;
-                    System.out.println("Column vectors:");
-                    for (LinkedList<Integer> vector : list)
-                    {
-                        System.out.print("Column " + c++ + ": ");
-                        for (Integer bit : vector)
-                        {
-                            System.out.print(bit + " ");
-                        }
-                        System.out.println();
-                    }
-                     */
-                    
-                    // Construct the adjacency matrix
-                    int dimension = list.size() + 1;
-                    int[][] matrix = new int[dimension][dimension];
-                    
-                    // Fill in the principle diagonal with 0s
-                    for (int i = 0; i < dimension; i++)
-                    {
-                        matrix[i][i] = 0;
-                    }
-                    
-                    // Now fill out the upper portion of the matrix
-                    for (int column = 1; column < dimension; column++)
-                    {
-                        for (int row = 0; row < list.get(column - 1).size(); row++)
-                        {
-                            matrix[row][column] = list.get(column - 1).get(row);
-                        }
-                    }
-                    
-                    // Mirror the matrix
-                    for (int row = 0; row < dimension; row++)
-                    {
-                        for (int col = row + 1; col < dimension; col++)
-                        {
-                            matrix[col][row] = matrix[row][col];
-                        }
-                    }
-                    
-                    // debug
-                    System.out.println("A(G) final");
-                    for (int row = 0; row < dimension; row++)
-                    {
-                        for (int col = 0; col < dimension; col++)
-                        {
-                            System.out.print(matrix[row][col] + " ");
-                        }
-                        System.out.println();
-                    }
-                    
-                    // Write the matrix to a file
-                    // File-name conventions: N<5>_n.amf, where n is the sequence number
-                    PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("N" + dimension + "_" + fileNumber++ + ".amf")));
-                    writer.println(dimension);
-                    for (int r = 0; r < dimension; r++)
-                    {
-                        for (int c = 0; c < dimension; c++)
-                        {
-                            writer.print(matrix[r][c] + " ");
-                        }
-                        writer.println();
-                    }
-                    writer.flush();
-                }
+		        // Create our parser
+		        G6Parser parser = new G6Parser();
+		        
+		        // File-name sequence number
+		        int fileNumber = 0;
+		        
+		        // Parse each line in the nauty output file and create an adjacency matrix for each
+		        String line = "";
+		        while ((line = reader.readLine()) != null)
+		        {
+		            System.out.println("Parsing: " + line);
+		            LinkedList<LinkedList<Integer>> list = parser.parseGraph(line);
+		            
+		            // debug
+		            /*
+		            int c = 1;
+		            System.out.println("Column vectors:");
+		            for (LinkedList<Integer> vector : list)
+		            {
+		                System.out.print("Column " + c++ + ": ");
+		                for (Integer bit : vector)
+		                {
+		                    System.out.print(bit + " ");
+		                }
+		                System.out.println();
+		            }
+		             */
+		            
+		            // Construct the adjacency matrix
+		            int dimension = list.size() + 1;
+		            int[][] matrix = new int[dimension][dimension];
+		            
+		            // Fill in the principle diagonal with 0s
+		            for (int i = 0; i < dimension; i++)
+		            {
+		                matrix[i][i] = 0;
+		            }
+		            
+		            // Now fill out the upper portion of the matrix
+		            for (int column = 1; column < dimension; column++)
+		            {
+		                for (int row = 0; row < list.get(column - 1).size(); row++)
+		                {
+		                    matrix[row][column] = list.get(column - 1).get(row);
+		                }
+		            }
+		            
+		            // Mirror the matrix
+		            for (int row = 0; row < dimension; row++)
+		            {
+		                for (int col = row + 1; col < dimension; col++)
+		                {
+		                    matrix[col][row] = matrix[row][col];
+		                }
+		            }
+		            
+		            // debug
+		            /*System.out.println("A(G) final");
+		            for (int row = 0; row < dimension; row++)
+		            {
+		                for (int col = 0; col < dimension; col++)
+		                {
+		                    System.out.print(matrix[row][col] + " ");
+		                }
+		                System.out.println();
+		            }*/
+		            
+		            // Write the matrix to a file
+		            // File-name conventions: N<5>_n.amf, where n is the sequence number
+		            PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("N" + dimension + "_" + args[0] + "_" + fileNumber++ + ".amf")));
+		            writer.println(dimension);
+		            for (int r = 0; r < dimension; r++)
+		            {
+		                for (int c = 0; c < dimension; c++)
+		                {
+		                    writer.print(matrix[r][c] + " ");
+		                }
+		                writer.println();
+		            }
+		            writer.flush();
+				writer.close();
+
+				System.out.println("File " + fileNumber + " processed.");
+		        }
       		}
       		catch (IndexOutOfBoundsException ex1)
       		{
-      			System.err.println("Error parsing nauty output file.");
+      			System.err.println("Error: IOB.");
+			ex1.printStackTrace();
       		}
       		catch (NumberFormatException ex2)
       		{
-      			System.err.println("Error parsing nauty output file.");
+      			System.err.println("Error: Number format.");
+			ex2.printStackTrace();
       		}
       		catch (IOException ex3)
       		{
-      			System.err.println("Error parsing nauty output file.");
+      			System.err.println("Error: I/O exception when parsing file.");
+			ex3.printStackTrace();
       		}
 		}
 	}
