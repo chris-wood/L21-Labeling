@@ -50,16 +50,18 @@ else:
 			delta1 = False
 			for line in p.stdout.readlines():
 				try:
-					if (line == "true\n"):
-						labelSpan = True
+					print(line)
+					if ("true" in line):
+						delta1 = True
 						print "delta+1"
 					else:
 						print "delta+2"
 				except:
 					print "uhoh"
+					raise Exception("Failed on file: " + str(file))
 
 			# Copy the file over to the correct location to run the graph generation program
-			if (labelSpan == True):
+			if (delta1 == True):
 				shutil.copy2(samples + '/' + file, d1out + '/' + file)
 			else:
 				shutil.copy2(samples + '/' + file, d2out + '/' + file)
