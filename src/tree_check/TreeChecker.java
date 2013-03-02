@@ -1,6 +1,4 @@
-
-<!-- saved from url=(0082)https://lhk-labelling.googlecode.com/svn/trunk/src/tree_check/src/TreeChecker.java -->
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"></head><body cz-shortcut-listen="true"><pre style="word-wrap: break-word; white-space: pre-wrap;">import java.io.BufferedReader;
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,15 +19,15 @@ public class TreeChecker
 		majorLabel = 0;
 		
 		// Set vertex degrees
-		for (int v = 0; v &lt; size; v++)
+		for (int v = 0; v < size; v++)
 		{
 			int sum = 0;
-			for (int c = 0; c &lt; size; c++)
+			for (int c = 0; c < size; c++)
 			{
 				sum += matrix[v][c];
 			}
 			degree[v] = sum;
-			if (degree[v] &gt; majorLabel)
+			if (degree[v] > majorLabel)
 			{
 				majorLabel = degree[v];
 			}
@@ -40,12 +38,12 @@ public class TreeChecker
 	{
 		boolean present = false;
 		
-		for (int i = 0; i &lt; degree.length; i++)
+		for (int i = 0; i < degree.length; i++)
 		{
-			if (degree[i] &lt; majorLabel)
+			if (degree[i] < majorLabel)
 			{
-				// get all 1path neighbors, if there are n &gt;= 3 neighbors, present = true
-				HashSet&lt;Integer&gt; neighbors = findOnePathNeighbors(i);
+				// get all 1path neighbors, if there are n >= 3 neighbors, present = true
+				HashSet<Integer> neighbors = findOnePathNeighbors(i);
 				int majorCount = 0;
 				for (Integer n : neighbors)
 				{
@@ -54,7 +52,7 @@ public class TreeChecker
 						majorCount++;
 					}
 				}
-				if (majorCount &gt;= 3)
+				if (majorCount >= 3)
 				{
 					present = true;
 					break;
@@ -70,11 +68,11 @@ public class TreeChecker
 		boolean present = false;
 		
 		// Search all major vertices
-		for (int i = 0; i &lt; degree.length; i++)
+		for (int i = 0; i < degree.length; i++)
 		{
 			if (degree[i] == majorLabel)
 			{
-				if (majorNeighborhoodSize(i, null) &gt;= 3)
+				if (majorNeighborhoodSize(i, null) >= 3)
 				{
 					present = true;
 					break;
@@ -85,19 +83,19 @@ public class TreeChecker
 		return present;
 	}
 	
-	public int majorNeighborhoodSize(int vertex, HashSet&lt;Integer&gt; visited)
+	public int majorNeighborhoodSize(int vertex, HashSet<Integer> visited)
 	{
 		if (visited == null)
 		{
-			visited = new HashSet&lt;Integer&gt;();
+			visited = new HashSet<Integer>();
 		}
 		
 		visited.add(vertex);
 		int size = 1;
 		
-		for (int v = 0; v &lt; dimension; v++)
+		for (int v = 0; v < dimension; v++)
 		{
-			if (adjacencyMatrix[vertex][v] == 1 &amp;&amp; !visited.contains(v) &amp;&amp; degree[v] == majorLabel)
+			if (adjacencyMatrix[vertex][v] == 1 && !visited.contains(v) && degree[v] == majorLabel)
 			{
 				size += majorNeighborhoodSize(v, visited);
 			}
@@ -110,11 +108,11 @@ public class TreeChecker
 	{
 		boolean present = false;
 		
-		for (int v = 0; v &lt; degree.length; v++)
+		for (int v = 0; v < degree.length; v++)
 		{
 			if (degree[v] == majorLabel)
 			{
-				HashSet&lt;Integer&gt; twoNeighbors = findTwoPathNeighbors(v);
+				HashSet<Integer> twoNeighbors = findTwoPathNeighbors(v);
 				int maxVertices = 0;
 				for (Integer tpn : twoNeighbors)
 				{
@@ -123,7 +121,7 @@ public class TreeChecker
 						maxVertices++;
 					}
 				}
-				if (maxVertices &gt;= (majorLabel - 1))
+				if (maxVertices >= (majorLabel - 1))
 				{
 					present = true;
 					break;
@@ -138,12 +136,12 @@ public class TreeChecker
 	{
 		boolean present = false;
 		
-		for (int v = 0; v &lt; degree.length; v++)
+		for (int v = 0; v < degree.length; v++)
 		{
 			if (degree[v] == 3) // we only expect delta=3 to be victim to these cases
 			{
-				HashSet&lt;Integer&gt; ones = findOnePathNeighbors(v);
-				HashSet&lt;Integer&gt; threes = findFourPathNeighbors(v);
+				HashSet<Integer> ones = findOnePathNeighbors(v);
+				HashSet<Integer> threes = findFourPathNeighbors(v);
 			
 				// Check to see if threes has 3 deltas (with delta = 3)
 				int count = 0;
@@ -183,7 +181,7 @@ public class TreeChecker
 								count++;
 							}
 						}
-						if (count &gt;= 2)
+						if (count >= 2)
 						{
 							//System.out.println("2 - " + v);
 							present = true;
@@ -200,13 +198,13 @@ public class TreeChecker
 	{
 		boolean present = false;
 		
-		for (int v = 0; v &lt; degree.length; v++)
+		for (int v = 0; v < degree.length; v++)
 		{
 			if (degree[v] == 3) // we only expect delta=3 to be victim to these cases
 			{
-				HashSet&lt;Integer&gt; ones = findOnePathNeighbors(v);
-				HashSet&lt;Integer&gt; threes = findFourPathNeighbors(v);
-				HashSet&lt;Integer&gt; fours = findFivePathNeighbors(v);
+				HashSet<Integer> ones = findOnePathNeighbors(v);
+				HashSet<Integer> threes = findFourPathNeighbors(v);
+				HashSet<Integer> fours = findFivePathNeighbors(v);
 				
 				int oneCount = 0;
 				int threeCount = 0;
@@ -242,7 +240,7 @@ public class TreeChecker
 					}
 				}
 				
-				if (oneCount &gt;= 1 &amp;&amp; threeCount &gt;= 1 &amp;&amp; fourCount &gt;= 1)
+				if (oneCount >= 1 && threeCount >= 1 && fourCount >= 1)
 				{
 					present = true;
 					return present;
@@ -259,13 +257,13 @@ public class TreeChecker
 	{
 		boolean present = false;
 		
-		for (int v = 0; v &lt; degree.length; v++)
+		for (int v = 0; v < degree.length; v++)
 		{
 			if (degree[v] == 4) // we only expect delta=4/5 to be victim to these cases
-								// but delta=5 yields n&gt;20 nodes in the tree
+								// but delta=5 yields n>20 nodes in the tree
 			{
-				HashSet&lt;Integer&gt; twos = findTwoPathNeighbors(v);
-				HashSet&lt;Integer&gt; threes = findThreePathNeighbors(v);
+				HashSet<Integer> twos = findTwoPathNeighbors(v);
+				HashSet<Integer> threes = findThreePathNeighbors(v);
 				
 				boolean oneInTwo = false;
 				for (Integer n : twos)
@@ -288,10 +286,10 @@ public class TreeChecker
 							
 							// Now check to see if there is one two away from this delta,
 							// and that it is also in three. if so we have a winner
-							HashSet&lt;Integer&gt; otherTwos = findTwoPathNeighbors(n);
+							HashSet<Integer> otherTwos = findTwoPathNeighbors(n);
 							for (Integer vertex : otherTwos)
 							{
-								if (degree[vertex] == 4 &amp;&amp; threes.contains(vertex))
+								if (degree[vertex] == 4 && threes.contains(vertex))
 								{
 									present = true;
 									return true;
@@ -312,13 +310,13 @@ public class TreeChecker
 	{
 		boolean present = false;
 		
-		for (int v = 0; v &lt; degree.length; v++)
+		for (int v = 0; v < degree.length; v++)
 		{
 			if (degree[v] == 4) // we only expect delta=4/5 to be victim to these cases
-								// but delta=5 yields n&gt;20 nodes in the tree
+								// but delta=5 yields n>20 nodes in the tree
 			{
-				HashSet&lt;Integer&gt; twos = findTwoPathNeighbors(v);
-				HashSet&lt;Integer&gt; fours = findThreePathNeighbors(v);
+				HashSet<Integer> twos = findTwoPathNeighbors(v);
+				HashSet<Integer> fours = findThreePathNeighbors(v);
 				
 				boolean oneInTwo = false;
 				for (Integer n : twos)
@@ -341,10 +339,10 @@ public class TreeChecker
 							
 							// Now check to see if there is one two away from this delta,
 							// and that it is also in three. if so we have a winner
-							HashSet&lt;Integer&gt; otherTwos = findTwoPathNeighbors(n);
+							HashSet<Integer> otherTwos = findTwoPathNeighbors(n);
 							for (Integer vertex : otherTwos)
 							{
-								if (degree[vertex] == 4 &amp;&amp; fours.contains(vertex))
+								if (degree[vertex] == 4 && fours.contains(vertex))
 								{
 									present = true;
 									return true;
@@ -365,13 +363,13 @@ public class TreeChecker
 	{
 		boolean present = false;
 		
-		for (int v = 0; v &lt; degree.length; v++)
+		for (int v = 0; v < degree.length; v++)
 		{
 			if (degree[v] == 3) // we only expect delta=4/5 to be victim to these cases
-								// but delta=5 yields n&gt;20 nodes in the tree
+								// but delta=5 yields n>20 nodes in the tree
 			{
-				HashSet&lt;Integer&gt; fours = findFourPathNeighbors(v);
-				HashSet&lt;Integer&gt; fives = findFivePathNeighbors(v);
+				HashSet<Integer> fours = findFourPathNeighbors(v);
+				HashSet<Integer> fives = findFivePathNeighbors(v);
 				
 				boolean twoFours = false;
 				boolean twoFives = false;
@@ -392,15 +390,15 @@ public class TreeChecker
 	public int distance(int v1, int v2)
 	{
 		int d = 0;
-		HashSet&lt;Integer&gt; visited = new HashSet&lt;Integer&gt;();
-		ArrayList&lt;Integer&gt; queue = new ArrayList&lt;Integer&gt;();
+		HashSet<Integer> visited = new HashSet<Integer>();
+		ArrayList<Integer> queue = new ArrayList<Integer>();
 		queue.add(v1);
 		
-		while (queue.size() &gt; 0)
+		while (queue.size() > 0)
 		{
 			int current = queue.remove(0);
 			visited.add(current);
-			for (int i = 0; i &lt; this.adjacencyMatrix[0].length; i++)
+			for (int i = 0; i < this.adjacencyMatrix[0].length; i++)
 			{
 				if (adjacencyMatrix[current][i] == 1)
 				{
@@ -418,11 +416,11 @@ public class TreeChecker
 	/*
 	 * Helper method that finds all immediate neighboring vertices of a vertex.
 	 */
-	public HashSet&lt;Integer&gt; findOnePathNeighbors(int vertex) 
+	public HashSet<Integer> findOnePathNeighbors(int vertex) 
 	{
-		HashSet&lt;Integer&gt; neighbors = new HashSet&lt;Integer&gt;();
+		HashSet<Integer> neighbors = new HashSet<Integer>();
 
-		for (int col = 0; col &lt; dimension; col++) 
+		for (int col = 0; col < dimension; col++) 
 		{
 			if (adjacencyMatrix[vertex][col] == 1) 
 			{
@@ -437,12 +435,12 @@ public class TreeChecker
 	 * Helper method that finds all vertices that are exactly a distance 2 away
 	 * from the specified vertex.
 	 */
-	public HashSet&lt;Integer&gt; findTwoPathNeighbors(int vertex) 
+	public HashSet<Integer> findTwoPathNeighbors(int vertex) 
 	{
-		HashSet&lt;Integer&gt; neighbors = new HashSet&lt;Integer&gt;();
-		HashSet&lt;Integer&gt; temp;
+		HashSet<Integer> neighbors = new HashSet<Integer>();
+		HashSet<Integer> temp;
 
-		for (int col = 0; col &lt; dimension; col++) 
+		for (int col = 0; col < dimension; col++) 
 		{
 			if (adjacencyMatrix[vertex][col] == 1) 
 			{
@@ -462,20 +460,20 @@ public class TreeChecker
 	 * Helper method that finds all vertices that are exactly a distance 3 away
 	 * from the specified vertex.
 	 */
-	public HashSet&lt;Integer&gt; findThreePathNeighbors(int vertex) 
+	public HashSet<Integer> findThreePathNeighbors(int vertex) 
 	{
-		HashSet&lt;Integer&gt; neighbors = new HashSet&lt;Integer&gt;();
+		HashSet<Integer> neighbors = new HashSet<Integer>();
 
-		for (int col = 0; col &lt; dimension; col++) 
+		for (int col = 0; col < dimension; col++) 
 		{
 			if (adjacencyMatrix[vertex][col] == 1)
 			{
-				HashSet&lt;Integer&gt; temp = findOnePathNeighbors(col);
+				HashSet<Integer> temp = findOnePathNeighbors(col);
 				temp.remove(vertex);
 				
 				for (Integer n : temp)
 				{
-					HashSet&lt;Integer&gt; temp2 = findOnePathNeighbors(n);
+					HashSet<Integer> temp2 = findOnePathNeighbors(n);
 					temp2.remove(col);
 					for (Integer opn : temp)
 					{
@@ -492,20 +490,20 @@ public class TreeChecker
 		return neighbors;
 	}
 	
-	public HashSet&lt;Integer&gt; findFourPathNeighbors(int vertex)
+	public HashSet<Integer> findFourPathNeighbors(int vertex)
 	{
-		HashSet&lt;Integer&gt; neighbors = new HashSet&lt;Integer&gt;();
+		HashSet<Integer> neighbors = new HashSet<Integer>();
 		
-		for (int col = 0; col &lt; dimension; col++) 
+		for (int col = 0; col < dimension; col++) 
 		{
 			if (adjacencyMatrix[vertex][col] == 1)
 			{
-				HashSet&lt;Integer&gt; temp = findOnePathNeighbors(col);
+				HashSet<Integer> temp = findOnePathNeighbors(col);
 				temp.remove(vertex);
 				
 				for (Integer n : temp)
 				{
-					HashSet&lt;Integer&gt; temp2 = findOnePathNeighbors(n);
+					HashSet<Integer> temp2 = findOnePathNeighbors(n);
 					temp2.remove(col);
 					for (Integer opn : temp)
 					{
@@ -514,7 +512,7 @@ public class TreeChecker
 					
 					for (Integer tpn : temp2)
 					{
-						HashSet&lt;Integer&gt; fourSet = findOnePathNeighbors(tpn);
+						HashSet<Integer> fourSet = findOnePathNeighbors(tpn);
 						fourSet.remove(n); // remove where we came from
 						fourSet.removeAll(temp2);
 						for (Integer fpn : fourSet)
@@ -529,20 +527,20 @@ public class TreeChecker
 		return neighbors;
 	}
 	
-	public HashSet&lt;Integer&gt; findFivePathNeighbors(int vertex)
+	public HashSet<Integer> findFivePathNeighbors(int vertex)
 	{
-		HashSet&lt;Integer&gt; neighbors = new HashSet&lt;Integer&gt;();
+		HashSet<Integer> neighbors = new HashSet<Integer>();
 		
-		for (int col = 0; col &lt; dimension; col++) 
+		for (int col = 0; col < dimension; col++) 
 		{
 			if (adjacencyMatrix[vertex][col] == 1)
 			{
-				HashSet&lt;Integer&gt; temp = findOnePathNeighbors(col);
+				HashSet<Integer> temp = findOnePathNeighbors(col);
 				temp.remove(vertex);
 				
 				for (Integer n : temp)
 				{
-					HashSet&lt;Integer&gt; temp2 = findOnePathNeighbors(n);
+					HashSet<Integer> temp2 = findOnePathNeighbors(n);
 					temp2.remove(col);
 					for (Integer opn : temp)
 					{
@@ -551,12 +549,12 @@ public class TreeChecker
 					
 					for (Integer tpn : temp2)
 					{
-						HashSet&lt;Integer&gt; fourSet = findOnePathNeighbors(tpn);
+						HashSet<Integer> fourSet = findOnePathNeighbors(tpn);
 						fourSet.remove(n); // remove where we came from
 						fourSet.removeAll(temp2);
 						for (Integer fpn : fourSet)
 						{
-							HashSet&lt;Integer&gt; fiveSet = findOnePathNeighbors(fpn);
+							HashSet<Integer> fiveSet = findOnePathNeighbors(fpn);
 							fiveSet.remove(tpn); // remove where we came from
 							fiveSet.removeAll(fourSet);
 							for (Integer fivePn : fiveSet)
@@ -595,11 +593,11 @@ public class TreeChecker
 			int matrix[][] = new int[dimensions][dimensions];
 			
 			// Continue parsing in the rest of the data
-			for (int i = 0; i &lt; dimensions; i++)
+			for (int i = 0; i < dimensions; i++)
 			{
 				String line = reader.readLine();
 				String[] elements = line.split(" ");
-				for (int j = 0; j &lt; dimensions; j++)
+				for (int j = 0; j < dimensions; j++)
 				{
 					matrix[i][j] = Integer.parseInt(elements[j]);
 				}
@@ -640,4 +638,3 @@ public class TreeChecker
 		}
 	}
 }
-</pre></body></html>
