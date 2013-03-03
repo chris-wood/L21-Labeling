@@ -1,6 +1,4 @@
-
-<!-- saved from url=(0086)https://lhk-labelling.googlecode.com/svn/trunk/src/tree_check/src/AutomateTreeCheck.py -->
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"></head><body cz-shortcut-listen="true"><pre style="word-wrap: break-word; white-space: pre-wrap;">#!/usr/bin/python
+#!/usr/bin/python
 
 #
 # File: AutomateTreeCheck.py
@@ -33,23 +31,22 @@ else:
 		
 		# Get the extension and check it
 		fileName, fileExtension = os.path.splitext(file)
-		if (fileExtension == '.amf'):
+		if (fileExtension == '.amf'): # yeah, don't forget this... >.<
 			
 			# Run the L21 algorithm on all samples
-			print "running " + file
+			print "Running: " + file
 			p = subprocess.Popen('java ' + alg + ' ' + samples + '/' + file, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 			testPass = True
 			for line in p.stdout.readlines():
 				try:
-					if (line == "true\n"):
+					if ("true" in line):
 						testPass = False # it had the property, so test failed
 				except:
-					testPass = False
+					raise Exception("Something went wrong with file: " + str(file))
+					#testPass = False
 			
-			# Copy the file over to the correct location to run the graph generation program
+			# Copy the file over to the correct location for continual or manual inspection
 			if (testPass == True):
 				shutil.copy2(samples + '/' + file, passDir + '/' + file)
 			else:
 				shutil.copy2(samples + '/' + file, failDir + '/' + file)
-
-</pre></body></html>

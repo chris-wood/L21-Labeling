@@ -141,7 +141,7 @@ public class TreeChecker
 			if (degree[v] == 3) // we only expect delta=3 to be victim to these cases
 			{
 				HashSet<Integer> ones = findOnePathNeighbors(v);
-				HashSet<Integer> threes = findFourPathNeighbors(v);
+				HashSet<Integer> threes = newFindFour(v);
 			
 				// Check to see if threes has 3 deltas (with delta = 3)
 				int count = 0;
@@ -152,11 +152,11 @@ public class TreeChecker
 						count++;
 					}
 				}
-				if (count == 3)
+				if (count >= 3)
 				{
 					//System.out.println("1");
 					present = true;
-					break;
+					return true;
 				}
 				else // check for immediate delta and then 2 threes
 				{
@@ -168,23 +168,22 @@ public class TreeChecker
 						{
 							deltaN = true;
 							vertex = n;
-						}
-					}
-					if (deltaN)
-					{
-						count = 0;
-						for (Integer n : threes)
-						{
-							//System.out.println("four away = " + n);
-							if (degree[n] == 3)
+
+							count = 0;
+							for (Integer u : threes)
 							{
-								count++;
+								//System.out.println("four away = " + n);
+								if (degree[u] == 3)
+								{
+									count++;
+								}
 							}
-						}
-						if (count >= 2)
-						{
-							//System.out.println("2 - " + v);
-							present = true;
+							if (count >= 2)
+							{
+								//System.out.println("2 - " + v);
+								present = true;
+								return true;
+							}
 						}
 					}
 				}
@@ -203,8 +202,8 @@ public class TreeChecker
 			if (degree[v] == 3) // we only expect delta=3 to be victim to these cases
 			{
 				HashSet<Integer> ones = findOnePathNeighbors(v);
-				HashSet<Integer> threes = findFourPathNeighbors(v);
-				HashSet<Integer> fours = findFivePathNeighbors(v);
+				HashSet<Integer> threes = newFindFour(v);
+				HashSet<Integer> fours = newFindFive(v);
 				
 				int oneCount = 0;
 				int threeCount = 0;
@@ -489,6 +488,42 @@ public class TreeChecker
 
 		return neighbors;
 	}
+
+	public HashSet<Integer> newFindFour(int vertex)
+	{
+		HashSet<Integer> neighbors = new HashSet<Integer>();
+
+		HashSet<Integer> d1 = findOnePathNeighbors(vertex);
+		d1.remove(vertex);
+		for (Integer n1 : d1)
+		{
+			HashSet<Integer> d2 = findOnePathNeighbors(n1);
+			d2.remove(n1);
+			d2.remove(vertex);
+			for (Integer n2 : d2)
+			{
+				HashSet<Integer> d3 = findOnePathNeighbors(n2);
+				d3.remove(n2);
+				d3.remove(vertex);
+				d3.remove(n1);
+				for (Integer n3 : d3)
+				{
+					HashSet<Integer> d4 = findOnePathNeighbors(n3);
+					d4.remove(n2);
+					d4.remove(vertex);
+					d4.remove(n1);
+					d4.remove(n3);
+
+					for (Integer n4 : d4)
+					{
+						neighbors.add(n4);
+					}
+				}
+			}
+		}
+
+		return neighbors;
+	}
 	
 	public HashSet<Integer> findFourPathNeighbors(int vertex)
 	{
@@ -524,6 +559,51 @@ public class TreeChecker
 			}
 		}
 		
+		return neighbors;
+	}
+
+	public HashSet<Integer> newFindFive(int vertex)
+	{
+		HashSet<Integer> neighbors = new HashSet<Integer>();
+
+		HashSet<Integer> d1 = findOnePathNeighbors(vertex);
+		d1.remove(vertex);
+		for (Integer n1 : d1)
+		{
+			HashSet<Integer> d2 = findOnePathNeighbors(n1);
+			d2.remove(n1);
+			d2.remove(vertex);
+			for (Integer n2 : d2)
+			{
+				HashSet<Integer> d3 = findOnePathNeighbors(n2);
+				d3.remove(n2);
+				d3.remove(vertex);
+				d3.remove(n1);
+				for (Integer n3 : d3)
+				{
+					HashSet<Integer> d4 = findOnePathNeighbors(n3);
+					d4.remove(n2);
+					d4.remove(vertex);
+					d4.remove(n1);
+					d4.remove(n3);
+
+					for (Integer n4 : d4)
+					{
+						HashSet<Integer> d5 = findOnePathNeighbors(n4);
+						d5.remove(n2);
+						d5.remove(vertex);
+						d5.remove(n1);
+						d5.remove(n3);
+						d5.remove(n4);
+						for (Integer n5 : d5)
+						{
+							neighbors.add(n5);
+						}
+					}
+				}
+			}
+		}
+
 		return neighbors;
 	}
 	
@@ -582,6 +662,20 @@ public class TreeChecker
 			System.err.println("usage: java TreeChecker file");
 			return;
 		}
+
+		// test newFindFour
+		int[][] testMatrix = 
+		{
+			{0, 1, 0, 0, 0, 0},
+			{1, 0, 1, 0, 0, 0},
+			{0, 1, 0, 1, 0, 0},
+			{0, 0, 1, 0, 1, 1},
+			{0, 0, 0, 1, 0, 0},
+			{0, 0, 0, 1, 0, 0}
+		};
+		TreeChecker check = new TreeChecker(testMatrix, 6);
+		HashSet<Integer> fours = check.newFindFour(0);
+		System.out.println(fours);
         
 		// Try to create a buffer reader to parse the adjacency matrix
 		try
@@ -609,7 +703,8 @@ public class TreeChecker
 			System.out.println(checker.testMajorP3());
 			System.out.println(checker.testStar());
 			System.out.println(checker.testThreeStar());
-			System.out.println(checker.testSplitStar());
+			//System.out.println(checker.testSplitStar());
+
 			/*boolean result = checker.testForSubdividedP5();
 			if (result)
 			{
