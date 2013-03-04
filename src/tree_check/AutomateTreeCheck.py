@@ -47,6 +47,8 @@ else:
 			
 			# Copy the file over to the correct location for continual or manual inspection
 			if (testPass == True):
+				print("Passed (doesn't contain the forbidden subtree")
 				shutil.copy2(samples + '/' + file, passDir + '/' + file)
 			else:
+				print("Failed (contains the forbidden subtree")
 				shutil.copy2(samples + '/' + file, failDir + '/' + file)

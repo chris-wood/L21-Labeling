@@ -703,6 +703,9 @@ public class TreeChecker
 			System.out.println(checker.testMajorP3());
 			System.out.println(checker.testStar());
 			System.out.println(checker.testThreeStar());
+
+
+
 			//System.out.println(checker.testSplitStar());
 
 			/*boolean result = checker.testForSubdividedP5();
