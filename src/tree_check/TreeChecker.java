@@ -33,6 +33,139 @@ public class TreeChecker
 			}
 		}
 	}
+
+	public boolean testForLopsidedTree() { // TODO: implement this
+		boolean present = false;
+
+		for (int u = 0; u < degree.length; u++) {
+			if (degree[u] < majorLabel) {
+				HashSet<Integer> neighbors = findOnePathNeighbors(u);
+				int majorCount = 0;
+				for (Integer n : neighbors)
+				{
+					if (degree[n] == majorLabel)
+					{
+						majorCount++;
+					}
+				}
+
+				ArrayList<Integer> deltas = new ArrayList<Integer>();
+				if (majorCount == 2) {
+					HashSet<Integer> threes = newFindTwo(u);
+					int otherMajorCount = 0;
+					for (Integer n : threes)
+					{
+						if (degree[n] == majorLabel)
+						{
+							otherMajorCount++;
+							deltas.add(n);
+						}
+					}
+					if (deltas.size() == 2) {
+						ArrayList<Integer> twos = new ArrayList<Integer>();
+						for (Integer m : deltas) {
+							twos.add(m);
+						}
+						HashSet<Integer> setOfOtherTwos = newFindTwo(twos.get(0));
+						if (setOfOtherTwos.contains(twos.get(1))) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+
+		return present;
+	}
+
+
+	public boolean testTightConnectedJointStart() {
+		boolean present = false;
+
+		for (int u = 0; u < degree.length; u++) {
+			if (degree[u] < majorLabel) {
+				HashSet<Integer> neighbors = findOnePathNeighbors(u);
+				int majorCount = 0;
+				for (Integer n : neighbors)
+				{
+					if (degree[n] == majorLabel)
+					{
+						majorCount++;
+					}
+				}
+
+				ArrayList<Integer> deltas = new ArrayList<Integer>();
+				if (majorCount == 2) {
+					HashSet<Integer> threes = newFindTwo(u);
+					int otherMajorCount = 0;
+					for (Integer n : threes)
+					{
+						if (degree[n] == majorLabel)
+						{
+							otherMajorCount++;
+							deltas.add(n);
+						}
+					}
+					if (deltas.size() == 2) {
+						ArrayList<Integer> twos = new ArrayList<Integer>();
+						for (Integer m : deltas) {
+							twos.add(m);
+						}
+						HashSet<Integer> setOfOtherTwos = newFindTwo(twos.get(0));
+						if (setOfOtherTwos.contains(twos.get(1))) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+
+		return present;
+	}
+
+	public boolean testConnectedJointStart() {
+		boolean present = false;
+
+		for (int u = 0; u < degree.length; u++) {
+			if (degree[u] < majorLabel) {
+				HashSet<Integer> neighbors = findOnePathNeighbors(u);
+				int majorCount = 0;
+				for (Integer n : neighbors)
+				{
+					if (degree[n] == majorLabel)
+					{
+						majorCount++;
+					}
+				}
+
+				ArrayList<Integer> deltas = new ArrayList<Integer>();
+				if (majorCount == 2) {
+					HashSet<Integer> threes = newFindThree(u);
+					int otherMajorCount = 0;
+					for (Integer n : threes)
+					{
+						if (degree[n] == majorLabel)
+						{
+							otherMajorCount++;
+							deltas.add(n);
+						}
+					}
+					if (deltas.size() == 2) {
+						ArrayList<Integer> twos = new ArrayList<Integer>();
+						for (Integer m : deltas) {
+							twos.add(m);
+						}
+						HashSet<Integer> setOfOtherTwos = newFindTwo(twos.get(0));
+						if (setOfOtherTwos.contains(twos.get(1))) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+
+		return present;
+	}
 	
 	public boolean testStar()
 	{
@@ -489,6 +622,53 @@ public class TreeChecker
 		return neighbors;
 	}
 
+	public HashSet<Integer> newFindTwo(int vertex)
+	{
+		HashSet<Integer> neighbors = new HashSet<Integer>();
+
+		HashSet<Integer> d1 = findOnePathNeighbors(vertex);
+		d1.remove(vertex);
+		for (Integer n1 : d1)
+		{
+			HashSet<Integer> d2 = findOnePathNeighbors(n1);
+			d2.remove(n1);
+			d2.remove(vertex);
+			for (Integer n2 : d2)
+			{
+				neighbors.add(n2);
+			}
+		}
+
+		return neighbors;
+	}
+
+	public HashSet<Integer> newFindThree(int vertex)
+	{
+		HashSet<Integer> neighbors = new HashSet<Integer>();
+
+		HashSet<Integer> d1 = findOnePathNeighbors(vertex);
+		d1.remove(vertex);
+		for (Integer n1 : d1)
+		{
+			HashSet<Integer> d2 = findOnePathNeighbors(n1);
+			d2.remove(n1);
+			d2.remove(vertex);
+			for (Integer n2 : d2)
+			{
+				HashSet<Integer> d3 = findOnePathNeighbors(n2);
+				d3.remove(n2);
+				d3.remove(vertex);
+				d3.remove(n1);
+				for (Integer n3 : d3)
+				{
+					neighbors.add(n3);
+				}
+			}
+		}
+
+		return neighbors;
+	}
+
 	public HashSet<Integer> newFindFour(int vertex)
 	{
 		HashSet<Integer> neighbors = new HashSet<Integer>();
@@ -699,11 +879,12 @@ public class TreeChecker
 		
 			// Run the property checkers here
 			TreeChecker checker = new TreeChecker(matrix, dimensions);
-			System.out.println(checker.testDeltaMinusOneNeighbors());
-			System.out.println(checker.testMajorP3());
-			System.out.println(checker.testStar());
-			System.out.println(checker.testThreeStar());
-
+			//System.out.println(checker.testDeltaMinusOneNeighbors());
+			//System.out.println(checker.testMajorP3());
+			//System.out.println(checker.testStar());
+			//System.out.println(checker.testThreeStar());
+			System.out.println(checker.testConnectedJointStart());
+			System.out.println(checker.testTightConnectedJointStart());
 
 
 			//System.out.println(checker.testSplitStar());
