@@ -63,14 +63,14 @@ public class TreeChecker
             }
         }
 
-        System.out.println("Size = " + size);
-        for (int u = 0; u < size; u++) {
-        	System.out.printf("Distance from %d to all%n", u);
-        	for (int v = 0; v < size; v++) {
-        		System.out.println(v + " - " + distTo[u][v]);
-        	}
-        	System.out.println("----");
-        }
+        // System.out.println("Size = " + size);
+        // for (int u = 0; u < size; u++) {
+        // 	System.out.printf("Distance from %d to all%n", u);
+        // 	for (int v = 0; v < size; v++) {
+        // 		System.out.println(v + " - " + distTo[u][v]);
+        // 	}
+        // 	System.out.println("----");
+        // }
 	}
 
 	public boolean testTightConnectedJointStart() {
@@ -78,7 +78,7 @@ public class TreeChecker
 
 		for (int u = 0; u < degree.length; u++) {
 			if (degree[u] < majorLabel) {
-				HashSet<Integer> neighbors = findOnePathNeighbors(u);
+				HashSet<Integer> neighbors = findNeighbors(u, 1);
 				int majorCount = 0;
 				for (Integer n : neighbors)
 				{
@@ -90,7 +90,7 @@ public class TreeChecker
 
 				ArrayList<Integer> deltas = new ArrayList<Integer>();
 				if (majorCount == 2) {
-					HashSet<Integer> threes = newFindTwo(u);
+					HashSet<Integer> threes = findNeighbors(u, 2);
 					int otherMajorCount = 0;
 					for (Integer n : threes)
 					{
@@ -105,7 +105,7 @@ public class TreeChecker
 						for (Integer m : deltas) {
 							twos.add(m);
 						}
-						HashSet<Integer> setOfOtherTwos = newFindTwo(twos.get(0));
+						HashSet<Integer> setOfOtherTwos = findNeighbors(twos.get(0), 2);
 						if (setOfOtherTwos.contains(twos.get(1))) {
 							return true;
 						}
@@ -122,7 +122,7 @@ public class TreeChecker
 
 		for (int u = 0; u < degree.length; u++) {
 			if (degree[u] < majorLabel) {
-				HashSet<Integer> neighbors = findOnePathNeighbors(u);
+				HashSet<Integer> neighbors = findNeighbors(u, 1);
 				int majorCount = 0;
 				for (Integer n : neighbors)
 				{
@@ -134,7 +134,7 @@ public class TreeChecker
 
 				ArrayList<Integer> deltas = new ArrayList<Integer>();
 				if (majorCount == 2) {
-					HashSet<Integer> threes = newFindThree(u);
+					HashSet<Integer> threes = findNeighbors(u, 1);
 					int otherMajorCount = 0;
 					for (Integer n : threes)
 					{
@@ -149,7 +149,7 @@ public class TreeChecker
 						for (Integer m : deltas) {
 							twos.add(m);
 						}
-						HashSet<Integer> setOfOtherTwos = newFindTwo(twos.get(0));
+						HashSet<Integer> setOfOtherTwos = findNeighbors(twos.get(0), 2);
 						if (setOfOtherTwos.contains(twos.get(1))) {
 							return true;
 						}
@@ -170,7 +170,7 @@ public class TreeChecker
 			if (degree[i] < majorLabel)
 			{
 				// get all 1path neighbors, if there are n >= 3 neighbors, present = true
-				HashSet<Integer> neighbors = findOnePathNeighbors(i);
+				HashSet<Integer> neighbors = findNeighbors(i, 1);
 				int majorCount = 0;
 				for (Integer n : neighbors)
 				{
@@ -239,7 +239,7 @@ public class TreeChecker
 		{
 			if (degree[v] == majorLabel)
 			{
-				HashSet<Integer> twoNeighbors = findTwoPathNeighbors(v);
+				HashSet<Integer> twoNeighbors = findNeighbors(v, 1);
 				int maxVertices = 0;
 				for (Integer tpn : twoNeighbors)
 				{
@@ -267,8 +267,8 @@ public class TreeChecker
 		{
 			if (degree[v] == 3) // we only expect delta=3 to be victim to these cases
 			{
-				HashSet<Integer> ones = findOnePathNeighbors(v);
-				HashSet<Integer> threes = newFindFour(v);
+				HashSet<Integer> ones = findNeighbors(v, 1);
+				HashSet<Integer> threes = findNeighbors(v, 4);
 			
 				// Check to see if threes has 3 deltas (with delta = 3)
 				int count = 0;
@@ -328,9 +328,9 @@ public class TreeChecker
 		{
 			if (degree[v] == 3) // we only expect delta=3 to be victim to these cases
 			{
-				HashSet<Integer> ones = findOnePathNeighbors(v);
-				HashSet<Integer> threes = newFindFour(v);
-				HashSet<Integer> fours = newFindFive(v);
+				HashSet<Integer> ones = findNeighbors(v, 1);
+				HashSet<Integer> threes = findNeighbors(v, 4);
+				HashSet<Integer> fours = findNeighbors(v, 5);
 				
 				int oneCount = 0;
 				int threeCount = 0;
@@ -388,8 +388,8 @@ public class TreeChecker
 			if (degree[v] == 4) // we only expect delta=4/5 to be victim to these cases
 								// but delta=5 yields n>20 nodes in the tree
 			{
-				HashSet<Integer> twos = findTwoPathNeighbors(v);
-				HashSet<Integer> threes = findThreePathNeighbors(v);
+				HashSet<Integer> twos = findNeighbors(v, 2);
+				HashSet<Integer> threes = findNeighbors(v, 3);
 				
 				boolean oneInTwo = false;
 				for (Integer n : twos)
@@ -412,7 +412,7 @@ public class TreeChecker
 							
 							// Now check to see if there is one two away from this delta,
 							// and that it is also in three. if so we have a winner
-							HashSet<Integer> otherTwos = findTwoPathNeighbors(n);
+							HashSet<Integer> otherTwos = findNeighbors(n, 2);
 							for (Integer vertex : otherTwos)
 							{
 								if (degree[vertex] == 4 && threes.contains(vertex))
@@ -441,8 +441,8 @@ public class TreeChecker
 			if (degree[v] == 4) // we only expect delta=4/5 to be victim to these cases
 								// but delta=5 yields n>20 nodes in the tree
 			{
-				HashSet<Integer> twos = findTwoPathNeighbors(v);
-				HashSet<Integer> fours = findThreePathNeighbors(v);
+				HashSet<Integer> twos = findNeighbors(v, 2);
+				HashSet<Integer> fours = findNeighbors(v, 3);
 				
 				boolean oneInTwo = false;
 				for (Integer n : twos)
@@ -465,7 +465,7 @@ public class TreeChecker
 							
 							// Now check to see if there is one two away from this delta,
 							// and that it is also in three. if so we have a winner
-							HashSet<Integer> otherTwos = findTwoPathNeighbors(n);
+							HashSet<Integer> otherTwos = findNeighbors(n, 2);
 							for (Integer vertex : otherTwos)
 							{
 								if (degree[vertex] == 4 && fours.contains(vertex))
@@ -494,8 +494,8 @@ public class TreeChecker
 			if (degree[v] == 3) // we only expect delta=4/5 to be victim to these cases
 								// but delta=5 yields n>20 nodes in the tree
 			{
-				HashSet<Integer> fours = findFourPathNeighbors(v);
-				HashSet<Integer> fives = findFivePathNeighbors(v);
+				HashSet<Integer> fours = findNeighbors(v, 4);
+				HashSet<Integer> fives = findNeighbors(v, 5);
 				
 				boolean twoFours = false;
 				boolean twoFives = false;
@@ -839,9 +839,11 @@ public class TreeChecker
 			{0, 0, 0, 1, 0, 0}
 		};
 		TreeChecker check = new TreeChecker(testMatrix, 6);
-		HashSet<Integer> fours = check.newFindFour(0);
+		HashSet<Integer> fours = check.findNeighbors(0, 4);
 		System.out.println(fours);
-        
+        System.out.println("ASDASD");
+
+
 		// Try to create a buffer reader to parse the adjacency matrix
 		try
 		{
@@ -865,12 +867,12 @@ public class TreeChecker
 			// Run the property checkers here
 			System.out.println("Dimension = " + dimensions);
 			TreeChecker checker = new TreeChecker(matrix, dimensions);
-			//System.out.println(checker.testDeltaMinusOneNeighbors());
+			System.out.println(checker.testDeltaMinusOneNeighbors());
 			//System.out.println(checker.testMajorP3());
 			//System.out.println(checker.testStar());
 			//System.out.println(checker.testThreeStar());
-			System.out.println(checker.testConnectedJointStart());
-			System.out.println(checker.testTightConnectedJointStart());
+			// System.out.println(checker.testConnectedJointStart());
+			// System.out.println(checker.testTightConnectedJointStart());
 
 
 			//System.out.println(checker.testSplitStar());
