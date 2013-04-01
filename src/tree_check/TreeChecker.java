@@ -6,6 +6,7 @@ import java.util.HashSet;
 
 public class TreeChecker 
 {
+	public int[][] distTo;
 	public int[][] adjacencyMatrix;
 	public int dimension;
 	public int majorLabel;
@@ -15,6 +16,7 @@ public class TreeChecker
 	{
 		this.adjacencyMatrix = matrix;
 		this.dimension = size;
+		this.distTo = new int[size][size];
 		degree = new int[size];
 		majorLabel = 0;
 		
@@ -32,52 +34,44 @@ public class TreeChecker
 				majorLabel = degree[v];
 			}
 		}
+
+		// initialize distances to infinity
+        for (int v = 0; v < size; v++) {
+            for (int w = 0; w < size; w++) {
+                distTo[v][w] = size + 1;
+            }
+        }
+
+        // initialize distances using edge-weighted digraph's
+        for (int v = 0; v < size; v++) {
+        	for (int w = 0; w < size; w++) {
+        		if (matrix[v][w] == 1) {
+        			distTo[v][w] = 1;
+        		}
+        	}
+        }
+
+        // Floyd-Warshall updates
+        for (int i = 0; i < size; i++) {
+            // compute shortest paths using only 0, 1, ..., i as intermediate vertices
+            for (int v = 0; v < size; v++) {
+                for (int w = 0; w < size; w++) {
+                    if (distTo[v][w] > distTo[v][i] + distTo[i][w]) {
+                        distTo[v][w] = distTo[v][i] + distTo[i][w];
+                    }
+                }
+            }
+        }
+
+        System.out.println("Size = " + size);
+        for (int u = 0; u < size; u++) {
+        	System.out.printf("Distance from %d to all%n", u);
+        	for (int v = 0; v < size; v++) {
+        		System.out.println(v + " - " + distTo[u][v]);
+        	}
+        	System.out.println("----");
+        }
 	}
-
-	public boolean testForLopsidedTree() { // TODO: implement this
-		boolean present = false;
-
-		for (int u = 0; u < degree.length; u++) {
-			if (degree[u] < majorLabel) {
-				HashSet<Integer> neighbors = findOnePathNeighbors(u);
-				int majorCount = 0;
-				for (Integer n : neighbors)
-				{
-					if (degree[n] == majorLabel)
-					{
-						majorCount++;
-					}
-				}
-
-				ArrayList<Integer> deltas = new ArrayList<Integer>();
-				if (majorCount == 2) {
-					HashSet<Integer> threes = newFindTwo(u);
-					int otherMajorCount = 0;
-					for (Integer n : threes)
-					{
-						if (degree[n] == majorLabel)
-						{
-							otherMajorCount++;
-							deltas.add(n);
-						}
-					}
-					if (deltas.size() == 2) {
-						ArrayList<Integer> twos = new ArrayList<Integer>();
-						for (Integer m : deltas) {
-							twos.add(m);
-						}
-						HashSet<Integer> setOfOtherTwos = newFindTwo(twos.get(0));
-						if (setOfOtherTwos.contains(twos.get(1))) {
-							return true;
-						}
-					}
-				}
-			}
-		}
-
-		return present;
-	}
-
 
 	public boolean testTightConnectedJointStart() {
 		boolean present = false;
@@ -519,316 +513,307 @@ public class TreeChecker
 		return present;
 	}
 	
+	// Determine distance between two vertices...
 	public int distance(int v1, int v2)
 	{
-		int d = 0;
-		HashSet<Integer> visited = new HashSet<Integer>();
-		ArrayList<Integer> queue = new ArrayList<Integer>();
-		queue.add(v1);
-		
-		while (queue.size() > 0)
-		{
-			int current = queue.remove(0);
-			visited.add(current);
-			for (int i = 0; i < this.adjacencyMatrix[0].length; i++)
-			{
-				if (adjacencyMatrix[current][i] == 1)
-				{
-					if (!visited.contains(i))
-					{
-						queue.add(i);
-					}
-				}
-			}
-		}
-		
-		return d;
+		return distTo[v1][v2];
 	}
 
-	/*
-	 * Helper method that finds all immediate neighboring vertices of a vertex.
-	 */
-	public HashSet<Integer> findOnePathNeighbors(int vertex) 
-	{
+	// Find all neighbors at a given distance...
+	public HashSet<Integer> findNeighbors(int v, int distance) {
 		HashSet<Integer> neighbors = new HashSet<Integer>();
-
-		for (int col = 0; col < dimension; col++) 
-		{
-			if (adjacencyMatrix[vertex][col] == 1) 
-			{
-				neighbors.add(col);
+		for (int i = 0; i < dimension; i++) {
+			if (distTo[v][i] == distance) {
+				neighbors.add(i);
 			}
 		}
-
 		return neighbors;
 	}
 
-	/*
-	 * Helper method that finds all vertices that are exactly a distance 2 away
-	 * from the specified vertex.
-	 */
-	public HashSet<Integer> findTwoPathNeighbors(int vertex) 
-	{
-		HashSet<Integer> neighbors = new HashSet<Integer>();
-		HashSet<Integer> temp;
+	// /*
+	//  * Helper method that finds all immediate neighboring vertices of a vertex.
+	//  */
+	// public HashSet<Integer> findOnePathNeighbors(int vertex) 
+	// {
+	// 	HashSet<Integer> neighbors = new HashSet<Integer>();
 
-		for (int col = 0; col < dimension; col++) 
-		{
-			if (adjacencyMatrix[vertex][col] == 1) 
-			{
-				temp = findOnePathNeighbors(col);
-				temp.remove(vertex); // remove us from the set of neighbors
-				for (Integer neighbor : temp) 
-				{
-					neighbors.add(neighbor);
-				}
-			}
-		}
+	// 	for (int col = 0; col < dimension; col++) 
+	// 	{
+	// 		if (adjacencyMatrix[vertex][col] == 1) 
+	// 		{
+	// 			neighbors.add(col);
+	// 		}
+	// 	}
 
-		return neighbors;
-	}
+	// 	return neighbors;
+	// }
+
+	// /*
+	//  * Helper method that finds all vertices that are exactly a distance 2 away
+	//  * from the specified vertex.
+	//  */
+	// public HashSet<Integer> findTwoPathNeighbors(int vertex) 
+	// {
+	// 	HashSet<Integer> neighbors = new HashSet<Integer>();
+	// 	HashSet<Integer> temp;
+
+	// 	for (int col = 0; col < dimension; col++) 
+	// 	{
+	// 		if (adjacencyMatrix[vertex][col] == 1) 
+	// 		{
+	// 			temp = findOnePathNeighbors(col);
+	// 			temp.remove(vertex); // remove us from the set of neighbors
+	// 			for (Integer neighbor : temp) 
+	// 			{
+	// 				neighbors.add(neighbor);
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return neighbors;
+	// }
 	
-	/*
-	 * Helper method that finds all vertices that are exactly a distance 3 away
-	 * from the specified vertex.
-	 */
-	public HashSet<Integer> findThreePathNeighbors(int vertex) 
-	{
-		HashSet<Integer> neighbors = new HashSet<Integer>();
+	// /*
+	//  * Helper method that finds all vertices that are exactly a distance 3 away
+	//  * from the specified vertex.
+	//  */
+	// public HashSet<Integer> findThreePathNeighbors(int vertex) 
+	// {
+	// 	HashSet<Integer> neighbors = new HashSet<Integer>();
 
-		for (int col = 0; col < dimension; col++) 
-		{
-			if (adjacencyMatrix[vertex][col] == 1)
-			{
-				HashSet<Integer> temp = findOnePathNeighbors(col);
-				temp.remove(vertex);
+	// 	for (int col = 0; col < dimension; col++) 
+	// 	{
+	// 		if (adjacencyMatrix[vertex][col] == 1)
+	// 		{
+	// 			HashSet<Integer> temp = findOnePathNeighbors(col);
+	// 			temp.remove(vertex);
 				
-				for (Integer n : temp)
-				{
-					HashSet<Integer> temp2 = findOnePathNeighbors(n);
-					temp2.remove(col);
-					for (Integer opn : temp)
-					{
-						temp2.remove(opn);
-					}
-					for (Integer tpn : temp2)
-					{
-						neighbors.add(tpn);
-					}
-				}
-			}
-		}
+	// 			for (Integer n : temp)
+	// 			{
+	// 				HashSet<Integer> temp2 = findOnePathNeighbors(n);
+	// 				temp2.remove(col);
+	// 				for (Integer opn : temp)
+	// 				{
+	// 					temp2.remove(opn);
+	// 				}
+	// 				for (Integer tpn : temp2)
+	// 				{
+	// 					neighbors.add(tpn);
+	// 				}
+	// 			}
+	// 		}
+	// 	}
 
-		return neighbors;
-	}
+	// 	return neighbors;
+	// }
 
-	public HashSet<Integer> newFindTwo(int vertex)
-	{
-		HashSet<Integer> neighbors = new HashSet<Integer>();
+	// public HashSet<Integer> newFindTwo(int vertex)
+	// {
+	// 	HashSet<Integer> neighbors = new HashSet<Integer>();
 
-		HashSet<Integer> d1 = findOnePathNeighbors(vertex);
-		d1.remove(vertex);
-		for (Integer n1 : d1)
-		{
-			HashSet<Integer> d2 = findOnePathNeighbors(n1);
-			d2.remove(n1);
-			d2.remove(vertex);
-			for (Integer n2 : d2)
-			{
-				neighbors.add(n2);
-			}
-		}
+	// 	HashSet<Integer> d1 = findOnePathNeighbors(vertex);
+	// 	d1.remove(vertex);
+	// 	for (Integer n1 : d1)
+	// 	{
+	// 		HashSet<Integer> d2 = findOnePathNeighbors(n1);
+	// 		d2.remove(n1);
+	// 		d2.remove(vertex);
+	// 		for (Integer n2 : d2)
+	// 		{
+	// 			neighbors.add(n2);
+	// 		}
+	// 	}
 
-		return neighbors;
-	}
+	// 	return neighbors;
+	// }
 
-	public HashSet<Integer> newFindThree(int vertex)
-	{
-		HashSet<Integer> neighbors = new HashSet<Integer>();
+	// public HashSet<Integer> newFindThree(int vertex)
+	// {
+	// 	HashSet<Integer> neighbors = new HashSet<Integer>();
 
-		HashSet<Integer> d1 = findOnePathNeighbors(vertex);
-		d1.remove(vertex);
-		for (Integer n1 : d1)
-		{
-			HashSet<Integer> d2 = findOnePathNeighbors(n1);
-			d2.remove(n1);
-			d2.remove(vertex);
-			for (Integer n2 : d2)
-			{
-				HashSet<Integer> d3 = findOnePathNeighbors(n2);
-				d3.remove(n2);
-				d3.remove(vertex);
-				d3.remove(n1);
-				for (Integer n3 : d3)
-				{
-					neighbors.add(n3);
-				}
-			}
-		}
+	// 	HashSet<Integer> d1 = findOnePathNeighbors(vertex);
+	// 	d1.remove(vertex);
+	// 	for (Integer n1 : d1)
+	// 	{
+	// 		HashSet<Integer> d2 = findOnePathNeighbors(n1);
+	// 		d2.remove(n1);
+	// 		d2.remove(vertex);
+	// 		for (Integer n2 : d2)
+	// 		{
+	// 			HashSet<Integer> d3 = findOnePathNeighbors(n2);
+	// 			d3.remove(n2);
+	// 			d3.remove(vertex);
+	// 			d3.remove(n1);
+	// 			for (Integer n3 : d3)
+	// 			{
+	// 				neighbors.add(n3);
+	// 			}
+	// 		}
+	// 	}
 
-		return neighbors;
-	}
+	// 	return neighbors;
+	// }
 
-	public HashSet<Integer> newFindFour(int vertex)
-	{
-		HashSet<Integer> neighbors = new HashSet<Integer>();
+	// public HashSet<Integer> newFindFour(int vertex)
+	// {
+	// 	HashSet<Integer> neighbors = new HashSet<Integer>();
 
-		HashSet<Integer> d1 = findOnePathNeighbors(vertex);
-		d1.remove(vertex);
-		for (Integer n1 : d1)
-		{
-			HashSet<Integer> d2 = findOnePathNeighbors(n1);
-			d2.remove(n1);
-			d2.remove(vertex);
-			for (Integer n2 : d2)
-			{
-				HashSet<Integer> d3 = findOnePathNeighbors(n2);
-				d3.remove(n2);
-				d3.remove(vertex);
-				d3.remove(n1);
-				for (Integer n3 : d3)
-				{
-					HashSet<Integer> d4 = findOnePathNeighbors(n3);
-					d4.remove(n2);
-					d4.remove(vertex);
-					d4.remove(n1);
-					d4.remove(n3);
+	// 	HashSet<Integer> d1 = findOnePathNeighbors(vertex);
+	// 	d1.remove(vertex);
+	// 	for (Integer n1 : d1)
+	// 	{
+	// 		HashSet<Integer> d2 = findOnePathNeighbors(n1);
+	// 		d2.remove(n1);
+	// 		d2.remove(vertex);
+	// 		for (Integer n2 : d2)
+	// 		{
+	// 			HashSet<Integer> d3 = findOnePathNeighbors(n2);
+	// 			d3.remove(n2);
+	// 			d3.remove(vertex);
+	// 			d3.remove(n1);
+	// 			for (Integer n3 : d3)
+	// 			{
+	// 				HashSet<Integer> d4 = findOnePathNeighbors(n3);
+	// 				d4.remove(n2);
+	// 				d4.remove(vertex);
+	// 				d4.remove(n1);
+	// 				d4.remove(n3);
 
-					for (Integer n4 : d4)
-					{
-						neighbors.add(n4);
-					}
-				}
-			}
-		}
+	// 				for (Integer n4 : d4)
+	// 				{
+	// 					neighbors.add(n4);
+	// 				}
+	// 			}
+	// 		}
+	// 	}
 
-		return neighbors;
-	}
+	// 	return neighbors;
+	// }
 	
-	public HashSet<Integer> findFourPathNeighbors(int vertex)
-	{
-		HashSet<Integer> neighbors = new HashSet<Integer>();
+	// public HashSet<Integer> findFourPathNeighbors(int vertex)
+	// {
+	// 	HashSet<Integer> neighbors = new HashSet<Integer>();
 		
-		for (int col = 0; col < dimension; col++) 
-		{
-			if (adjacencyMatrix[vertex][col] == 1)
-			{
-				HashSet<Integer> temp = findOnePathNeighbors(col);
-				temp.remove(vertex);
+	// 	for (int col = 0; col < dimension; col++) 
+	// 	{
+	// 		if (adjacencyMatrix[vertex][col] == 1)
+	// 		{
+	// 			HashSet<Integer> temp = findOnePathNeighbors(col);
+	// 			temp.remove(vertex);
 				
-				for (Integer n : temp)
-				{
-					HashSet<Integer> temp2 = findOnePathNeighbors(n);
-					temp2.remove(col);
-					for (Integer opn : temp)
-					{
-						temp2.remove(opn);
-					}
+	// 			for (Integer n : temp)
+	// 			{
+	// 				HashSet<Integer> temp2 = findOnePathNeighbors(n);
+	// 				temp2.remove(col);
+	// 				for (Integer opn : temp)
+	// 				{
+	// 					temp2.remove(opn);
+	// 				}
 					
-					for (Integer tpn : temp2)
-					{
-						HashSet<Integer> fourSet = findOnePathNeighbors(tpn);
-						fourSet.remove(n); // remove where we came from
-						fourSet.removeAll(temp2);
-						for (Integer fpn : fourSet)
-						{
-							neighbors.add(fpn);
-						}
-					}
-				}
-			}
-		}
+	// 				for (Integer tpn : temp2)
+	// 				{
+	// 					HashSet<Integer> fourSet = findOnePathNeighbors(tpn);
+	// 					fourSet.remove(n); // remove where we came from
+	// 					fourSet.removeAll(temp2);
+	// 					for (Integer fpn : fourSet)
+	// 					{
+	// 						neighbors.add(fpn);
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
 		
-		return neighbors;
-	}
+	// 	return neighbors;
+	// }
 
-	public HashSet<Integer> newFindFive(int vertex)
-	{
-		HashSet<Integer> neighbors = new HashSet<Integer>();
+	// public HashSet<Integer> newFindFive(int vertex)
+	// {
+	// 	HashSet<Integer> neighbors = new HashSet<Integer>();
 
-		HashSet<Integer> d1 = findOnePathNeighbors(vertex);
-		d1.remove(vertex);
-		for (Integer n1 : d1)
-		{
-			HashSet<Integer> d2 = findOnePathNeighbors(n1);
-			d2.remove(n1);
-			d2.remove(vertex);
-			for (Integer n2 : d2)
-			{
-				HashSet<Integer> d3 = findOnePathNeighbors(n2);
-				d3.remove(n2);
-				d3.remove(vertex);
-				d3.remove(n1);
-				for (Integer n3 : d3)
-				{
-					HashSet<Integer> d4 = findOnePathNeighbors(n3);
-					d4.remove(n2);
-					d4.remove(vertex);
-					d4.remove(n1);
-					d4.remove(n3);
+	// 	HashSet<Integer> d1 = findOnePathNeighbors(vertex);
+	// 	d1.remove(vertex);
+	// 	for (Integer n1 : d1)
+	// 	{
+	// 		HashSet<Integer> d2 = findOnePathNeighbors(n1);
+	// 		d2.remove(n1);
+	// 		d2.remove(vertex);
+	// 		for (Integer n2 : d2)
+	// 		{
+	// 			HashSet<Integer> d3 = findOnePathNeighbors(n2);
+	// 			d3.remove(n2);
+	// 			d3.remove(vertex);
+	// 			d3.remove(n1);
+	// 			for (Integer n3 : d3)
+	// 			{
+	// 				HashSet<Integer> d4 = findOnePathNeighbors(n3);
+	// 				d4.remove(n2);
+	// 				d4.remove(vertex);
+	// 				d4.remove(n1);
+	// 				d4.remove(n3);
 
-					for (Integer n4 : d4)
-					{
-						HashSet<Integer> d5 = findOnePathNeighbors(n4);
-						d5.remove(n2);
-						d5.remove(vertex);
-						d5.remove(n1);
-						d5.remove(n3);
-						d5.remove(n4);
-						for (Integer n5 : d5)
-						{
-							neighbors.add(n5);
-						}
-					}
-				}
-			}
-		}
+	// 				for (Integer n4 : d4)
+	// 				{
+	// 					HashSet<Integer> d5 = findOnePathNeighbors(n4);
+	// 					d5.remove(n2);
+	// 					d5.remove(vertex);
+	// 					d5.remove(n1);
+	// 					d5.remove(n3);
+	// 					d5.remove(n4);
+	// 					for (Integer n5 : d5)
+	// 					{
+	// 						neighbors.add(n5);
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
 
-		return neighbors;
-	}
+	// 	return neighbors;
+	// }
 	
-	public HashSet<Integer> findFivePathNeighbors(int vertex)
-	{
-		HashSet<Integer> neighbors = new HashSet<Integer>();
+	// public HashSet<Integer> findFivePathNeighbors(int vertex)
+	// {
+	// 	HashSet<Integer> neighbors = new HashSet<Integer>();
 		
-		for (int col = 0; col < dimension; col++) 
-		{
-			if (adjacencyMatrix[vertex][col] == 1)
-			{
-				HashSet<Integer> temp = findOnePathNeighbors(col);
-				temp.remove(vertex);
+	// 	for (int col = 0; col < dimension; col++) 
+	// 	{
+	// 		if (adjacencyMatrix[vertex][col] == 1)
+	// 		{
+	// 			HashSet<Integer> temp = findOnePathNeighbors(col);
+	// 			temp.remove(vertex);
 				
-				for (Integer n : temp)
-				{
-					HashSet<Integer> temp2 = findOnePathNeighbors(n);
-					temp2.remove(col);
-					for (Integer opn : temp)
-					{
-						temp2.remove(opn);
-					}
+	// 			for (Integer n : temp)
+	// 			{
+	// 				HashSet<Integer> temp2 = findOnePathNeighbors(n);
+	// 				temp2.remove(col);
+	// 				for (Integer opn : temp)
+	// 				{
+	// 					temp2.remove(opn);
+	// 				}
 					
-					for (Integer tpn : temp2)
-					{
-						HashSet<Integer> fourSet = findOnePathNeighbors(tpn);
-						fourSet.remove(n); // remove where we came from
-						fourSet.removeAll(temp2);
-						for (Integer fpn : fourSet)
-						{
-							HashSet<Integer> fiveSet = findOnePathNeighbors(fpn);
-							fiveSet.remove(tpn); // remove where we came from
-							fiveSet.removeAll(fourSet);
-							for (Integer fivePn : fiveSet)
-							{
-								neighbors.add(fivePn);
-							}
-						}
-					}
-				}
-			}
-		}
+	// 				for (Integer tpn : temp2)
+	// 				{
+	// 					HashSet<Integer> fourSet = findOnePathNeighbors(tpn);
+	// 					fourSet.remove(n); // remove where we came from
+	// 					fourSet.removeAll(temp2);
+	// 					for (Integer fpn : fourSet)
+	// 					{
+	// 						HashSet<Integer> fiveSet = findOnePathNeighbors(fpn);
+	// 						fiveSet.remove(tpn); // remove where we came from
+	// 						fiveSet.removeAll(fourSet);
+	// 						for (Integer fivePn : fiveSet)
+	// 						{
+	// 							neighbors.add(fivePn);
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
 		
-		return neighbors;
-	}
+	// 	return neighbors;
+	// }
 
 	/**
 	 * Main entry point of program
@@ -878,6 +863,7 @@ public class TreeChecker
 			}
 		
 			// Run the property checkers here
+			System.out.println("Dimension = " + dimensions);
 			TreeChecker checker = new TreeChecker(matrix, dimensions);
 			//System.out.println(checker.testDeltaMinusOneNeighbors());
 			//System.out.println(checker.testMajorP3());
@@ -916,4 +902,5 @@ public class TreeChecker
 			ex3.printStackTrace();
 		}
 	}
+
 }
