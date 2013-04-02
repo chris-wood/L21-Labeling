@@ -161,76 +161,9 @@ public class TreeChecker
 		return present;
 	}
 	
-	public boolean testStar()
-	{
-		boolean present = false;
-		
-		for (int i = 0; i < degree.length; i++)
-		{
-			if (degree[i] < majorLabel)
-			{
-				// get all 1path neighbors, if there are n >= 3 neighbors, present = true
-				HashSet<Integer> neighbors = findNeighbors(i, 1);
-				int majorCount = 0;
-				for (Integer n : neighbors)
-				{
-					if (degree[n] == majorLabel)
-					{
-						majorCount++;
-					}
-				}
-				if (majorCount >= 3)
-				{
-					present = true;
-					break;
-				}
-			}
-		}
-		
-		return present;
-	}
-	
-	public boolean testMajorP3()
-	{
-		boolean present = false;
-		
-		// Search all major vertices
-		for (int i = 0; i < degree.length; i++)
-		{
-			if (degree[i] == majorLabel)
-			{
-				if (majorNeighborhoodSize(i, null) >= 3)
-				{
-					present = true;
-					break;
-				}
-			}
-		}
-		
-		return present;
-	}
-	
-	public int majorNeighborhoodSize(int vertex, HashSet<Integer> visited)
-	{
-		if (visited == null)
-		{
-			visited = new HashSet<Integer>();
-		}
-		
-		visited.add(vertex);
-		int size = 1;
-		
-		for (int v = 0; v < dimension; v++)
-		{
-			if (adjacencyMatrix[vertex][v] == 1 && !visited.contains(v) && degree[v] == majorLabel)
-			{
-				size += majorNeighborhoodSize(v, visited);
-			}
-		}
-		
-		return size;
-	}
-	
+// TEST CASES!!!
+
+	// a single major vertex who has delta-1 neighbors at distance 2
 	public boolean testDeltaMinusOneNeighbors()
 	{
 		boolean present = false;
@@ -239,7 +172,7 @@ public class TreeChecker
 		{
 			if (degree[v] == majorLabel)
 			{
-				HashSet<Integer> twoNeighbors = findNeighbors(v, 1);
+				HashSet<Integer> twoNeighbors = findNeighbors(v, 2);
 				int maxVertices = 0;
 				for (Integer tpn : twoNeighbors)
 				{
@@ -258,67 +191,134 @@ public class TreeChecker
 		
 		return present;
 	}
-	
-	public boolean testThreeStar()
+
+	// three majors connected in a row
+	public boolean testMajorP3()
 	{
 		boolean present = false;
 		
-		for (int v = 0; v < degree.length; v++)
+		// Search all major vertices
+		for (int i = 0; i < degree.length; i++)
 		{
-			if (degree[v] == 3) // we only expect delta=3 to be victim to these cases
+			if (degree[i] == majorLabel)
 			{
-				HashSet<Integer> ones = findNeighbors(v, 1);
-				HashSet<Integer> threes = findNeighbors(v, 4);
-			
-				// Check to see if threes has 3 deltas (with delta = 3)
-				int count = 0;
-				for (Integer n : threes)
+				int deltaNeighbors = 0;
+				for (int j = 0; j < degree.length; j++) 
 				{
-					if (degree[n] == 3)
+					if (i != j) 
 					{
-						count++;
-					}
-				}
-				if (count >= 3)
-				{
-					//System.out.println("1");
-					present = true;
-					return true;
-				}
-				else // check for immediate delta and then 2 threes
-				{
-					boolean deltaN = false;
-					int vertex = -1;
-					for (Integer n : ones)
-					{
-						if (degree[n] == 3)
+						if (distTo[i][j] == 1 && degree[j] == majorLabel)
 						{
-							deltaN = true;
-							vertex = n;
-
-							count = 0;
-							for (Integer u : threes)
-							{
-								//System.out.println("four away = " + n);
-								if (degree[u] == 3)
-								{
-									count++;
-								}
-							}
-							if (count >= 2)
-							{
-								//System.out.println("2 - " + v);
-								present = true;
-								return true;
-							}
+							deltaNeighbors++;
 						}
 					}
+				}
+				if (deltaNeighbors >= 3) 
+				{
+					return true;
 				}
 			}
 		}
 		
 		return present;
 	}
+
+	// minor in the middle connected to three or more majors
+	public boolean testStar()
+	{
+		boolean present = false;
+		
+		for (int i = 0; i < degree.length; i++)
+		{
+			if (degree[i] < majorLabel)
+			{
+				// get all 1path neighbors, if there are n >= 3 neighbors, present = true
+				int majorCount = 0;
+				for (int j = 0; j < degree.length; j++) 
+				{
+					if (i != j)
+					{
+						if (degree[j] == majorLabel)
+						{
+							majorCount++;
+						}
+					}
+				}
+				if (majorCount >= 3)
+				{
+					present = true;
+					break;
+				}
+			}
+		}
+		
+		return present;
+	}
+
+// same forbidden subtree as in build3 algorithm, and also the algorithm 
+	public boolean testThreeStarD3()
+	{
+		boolean present = false;
+		if (majorLabel != 3) { // we expect delta=3 to be the case...
+			return false;
+		}
+		
+		for (int v = 0; v < degree.length; v++)
+		{
+			if (degree[v] == majorLabel) // we only expect delta=3 to be victim to these cases, but do majorlabel anyway
+			{
+				int majorAtThreeCount = 0;
+				for (int j = 0; j < degree.length; j++) 
+				{
+					if (i != j) 
+					{
+						if (distTo[v][j] == 4 && degree[j] == majorLabel) 
+						{
+							majorAtThreeCount++;
+						}
+					}
+				}
+				if (majorAtThreeCount >= 3) 
+				{
+					return true; 
+				} 
+			}
+		}	
+		return present;
+	}
+
+	public boolean testThreeStarCloseD3()
+	{
+		boolean present = false;
+		if (majorLabel != 3) { // we expect delta=3 to be the case...
+			return false;
+		}
+		
+		for (int v = 0; v < degree.length; v++)
+		{
+			if (degree[v] == majorLabel) // we only expect delta=3 to be victim to these cases, but do majorlabel anyway
+			{
+				int majorAtThreeCount = 0;
+				for (int j = 0; j < degree.length; j++) 
+				{
+					if (i != j) 
+					{
+						if (distTo[v][j] == 4 && degree[j] == majorLabel) 
+						{
+							majorAtThreeCount++;
+						}
+					}
+				}
+				if (majorAtThreeCount >= 3) 
+				{
+					return true; 
+				} 
+			}
+		}	
+		return present;
+	}
+
+// END TEST CASES
 	
 	public boolean testSplitStar()
 	{
@@ -578,14 +578,16 @@ public class TreeChecker
 					matrix[i][j] = Integer.parseInt(elements[j]);
 				}
 			}
+
+			// TODO: test cases for each of these graphs
 		
 			// Run the property checkers here
 			System.out.println("Dimension = " + dimensions);
 			TreeChecker checker = new TreeChecker(matrix, dimensions);
 			System.out.println(checker.testDeltaMinusOneNeighbors());
-			//System.out.println(checker.testMajorP3());
-			//System.out.println(checker.testStar());
-			//System.out.println(checker.testThreeStar());
+			System.out.println(checker.testMajorP3());
+			System.out.println(checker.testStar());
+			System.out.println(checker.testThreeStarD3());
 			// System.out.println(checker.testConnectedJointStart());
 			// System.out.println(checker.testTightConnectedJointStart());
 
