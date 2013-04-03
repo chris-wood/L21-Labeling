@@ -72,94 +72,6 @@ public class TreeChecker
         // 	System.out.println("----");
         // }
 	}
-
-	public boolean testTightConnectedJointStart() {
-		boolean present = false;
-
-		for (int u = 0; u < degree.length; u++) {
-			if (degree[u] < majorLabel) {
-				HashSet<Integer> neighbors = findNeighbors(u, 1);
-				int majorCount = 0;
-				for (Integer n : neighbors)
-				{
-					if (degree[n] == majorLabel)
-					{
-						majorCount++;
-					}
-				}
-
-				ArrayList<Integer> deltas = new ArrayList<Integer>();
-				if (majorCount == 2) {
-					HashSet<Integer> threes = findNeighbors(u, 2);
-					int otherMajorCount = 0;
-					for (Integer n : threes)
-					{
-						if (degree[n] == majorLabel)
-						{
-							otherMajorCount++;
-							deltas.add(n);
-						}
-					}
-					if (deltas.size() == 2) {
-						ArrayList<Integer> twos = new ArrayList<Integer>();
-						for (Integer m : deltas) {
-							twos.add(m);
-						}
-						HashSet<Integer> setOfOtherTwos = findNeighbors(twos.get(0), 2);
-						if (setOfOtherTwos.contains(twos.get(1))) {
-							return true;
-						}
-					}
-				}
-			}
-		}
-
-		return present;
-	}
-
-	public boolean testConnectedJointStart() {
-		boolean present = false;
-
-		for (int u = 0; u < degree.length; u++) {
-			if (degree[u] < majorLabel) {
-				HashSet<Integer> neighbors = findNeighbors(u, 1);
-				int majorCount = 0;
-				for (Integer n : neighbors)
-				{
-					if (degree[n] == majorLabel)
-					{
-						majorCount++;
-					}
-				}
-
-				ArrayList<Integer> deltas = new ArrayList<Integer>();
-				if (majorCount == 2) {
-					HashSet<Integer> threes = findNeighbors(u, 1);
-					int otherMajorCount = 0;
-					for (Integer n : threes)
-					{
-						if (degree[n] == majorLabel)
-						{
-							otherMajorCount++;
-							deltas.add(n);
-						}
-					}
-					if (deltas.size() == 2) {
-						ArrayList<Integer> twos = new ArrayList<Integer>();
-						for (Integer m : deltas) {
-							twos.add(m);
-						}
-						HashSet<Integer> setOfOtherTwos = findNeighbors(twos.get(0), 2);
-						if (setOfOtherTwos.contains(twos.get(1))) {
-							return true;
-						}
-					}
-				}
-			}
-		}
-
-		return present;
-	}
 	
 // TEST CASES!!!
 
@@ -270,7 +182,38 @@ public class TreeChecker
 				int majorAtThreeCount = 0;
 				for (int j = 0; j < degree.length; j++) 
 				{
-					if (i != j) 
+					if (v != j) 
+					{
+						if (distTo[v][j] == 4 && degree[j] == majorLabel) 
+						{
+							majorAtThreeCount++;
+						}
+					}
+				}
+				if (majorAtThreeCount >= 3) 
+				{
+					return true; 
+				} 
+			}
+		}	
+		return present;
+	}
+// same as above but the center has a delta neighbor and then is the endpoint for two delta-segments of length 4
+	public boolean testThreeStarCloseD3()
+	{
+		boolean present = false;
+		if (majorLabel != 3) { // we expect delta=3 to be the case...
+			return false;
+		}
+		
+		for (int v = 0; v < degree.length; v++)
+		{
+			if (degree[v] == majorLabel) // we only expect delta=3 to be victim to these cases, but do majorlabel anyway
+			{
+				int majorAtThreeCount = 0;
+				for (int j = 0; j < degree.length; j++) 
+				{
+					if (v != j) 
 					{
 						if (distTo[v][j] == 4 && degree[j] == majorLabel) 
 						{
@@ -287,34 +230,131 @@ public class TreeChecker
 		return present;
 	}
 
-	public boolean testThreeStarCloseD3()
-	{
+	public boolean testConnectedJointStart() {
 		boolean present = false;
-		if (majorLabel != 3) { // we expect delta=3 to be the case...
-			return false;
-		}
-		
-		for (int v = 0; v < degree.length; v++)
-		{
-			if (degree[v] == majorLabel) // we only expect delta=3 to be victim to these cases, but do majorlabel anyway
-			{
-				int majorAtThreeCount = 0;
-				for (int j = 0; j < degree.length; j++) 
+
+		for (int u = 0; u < degree.length; u++) {
+			if (degree[u] < majorLabel) {
+
+				// See if this is the center of one joint star
+				HashSet<Integer> neighbors = findNeighbors(u, 1);
+				HashSet<Integer> deltas = new HashSet<Integer>();
+				int majorCount = 0;
+				for (Integer n : neighbors)
 				{
-					if (i != j) 
+					if (degree[n] == majorLabel)
 					{
-						if (distTo[v][j] == 4 && degree[j] == majorLabel) 
-						{
-							majorAtThreeCount++;
+						majorCount++;
+						deltas.add(n);
+					}
+				}
+
+				// Search for the center of another joint star
+				if (majorCount == 2) {
+					for (int v = 0; v < degree.length; v++) 
+					{
+						if (degree[v] < majorLabel && u != v) {
+							HashSet<Integer> otherNeighbors = findNeighbors(v, 1);
+							majorCount = 0;
+							for (Integer n : neighbors)
+							{
+								if (degree[n] == majorLabel && !deltas.contains(n))
+								{
+									majorCount++;
+								}
+							}
+
+							if (majorCount == 2)
+							{
+								return true; // if it's three or more then the earlier case of a minor with three delta neighbors will get it!
+							}
 						}
 					}
 				}
-				if (majorAtThreeCount >= 3) 
-				{
-					return true; 
-				} 
 			}
-		}	
+		}
+
+		return present;
+	}
+
+	public boolean testTightConnectedJointStart() {
+		boolean present = false;
+
+		for (int u = 0; u < degree.length; u++) {
+			if (degree[u] < majorLabel) {
+				// See if this is the center of one joint star
+				HashSet<Integer> neighbors = findNeighbors(u, 1);
+				HashSet<Integer> deltas = new HashSet<Integer>();
+				int majorCount = 0;
+				for (Integer n : neighbors)
+				{
+					if (degree[n] == majorLabel)
+					{
+						majorCount++;
+						deltas.add(n);
+					}
+				}
+
+				// Search for the center of another joint star
+				if (majorCount == 2) {
+					for (int v = 0; v < degree.length; v++) 
+					{
+						if (degree[v] < majorLabel && u != v) {
+							HashSet<Integer> otherNeighbors = findNeighbors(v, 1);
+							majorCount = 0;
+							for (Integer n : neighbors)
+							{
+								if (degree[n] == majorLabel && !deltas.contains(n))
+								{
+									majorCount++;
+								}
+							}
+
+							if (majorCount == 2)
+							{
+								return true; // if it's three or more then the earlier case of a minor with three delta neighbors will get it!
+							}
+						}
+					}
+				}
+
+
+				// HashSet<Integer> neighbors = findNeighbors(u, 1);
+				// int majorCount = 0;
+				// for (Integer n : neighbors)
+				// {
+				// 	if (degree[n] == majorLabel)
+				// 	{
+				// 		majorCount++;
+				// 	}
+				// }
+
+				// ArrayList<Integer> deltas = new ArrayList<Integer>();
+				// if (majorCount == 2) {
+				// 	HashSet<Integer> threes = findNeighbors(u, 2);
+				// 	int otherMajorCount = 0;
+				// 	for (Integer n : threes)
+				// 	{
+				// 		if (degree[n] == majorLabel)
+				// 		{
+				// 			otherMajorCount++;
+				// 			deltas.add(n);
+				// 		}
+				// 	}
+				// 	if (deltas.size() == 2) {
+				// 		ArrayList<Integer> twos = new ArrayList<Integer>();
+				// 		for (Integer m : deltas) {
+				// 			twos.add(m);
+				// 		}
+				// 		HashSet<Integer> setOfOtherTwos = findNeighbors(twos.get(0), 2);
+				// 		if (setOfOtherTwos.contains(twos.get(1))) {
+				// 			return true;
+				// 		}
+				// 	}
+				// }
+			}
+		}
+
 		return present;
 	}
 
@@ -588,7 +628,8 @@ public class TreeChecker
 			System.out.println(checker.testMajorP3());
 			System.out.println(checker.testStar());
 			System.out.println(checker.testThreeStarD3());
-			// System.out.println(checker.testConnectedJointStart());
+			System.out.println(checker.testThreeStarCloseD3());
+			System.out.println(checker.testConnectedJointStart());
 			// System.out.println(checker.testTightConnectedJointStart());
 
 
