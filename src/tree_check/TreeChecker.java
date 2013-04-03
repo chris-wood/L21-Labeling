@@ -96,7 +96,7 @@ public class TreeChecker
 				if (maxVertices >= (majorLabel - 1))
 				{
 					present = true;
-					break;
+					return true;
 				}
 			}
 		}
@@ -150,7 +150,7 @@ public class TreeChecker
 				{
 					if (i != j)
 					{
-						if (degree[j] == majorLabel)
+						if (degree[j] == majorLabel && distTo[i][j] == 1)
 						{
 							majorCount++;
 						}
@@ -158,8 +158,8 @@ public class TreeChecker
 				}
 				if (majorCount >= 3)
 				{
-					present = true;
-					break;
+					System.out.println("vertex = " + i);
+					return true;
 				}
 			}
 		}
@@ -233,6 +233,8 @@ public class TreeChecker
 	public boolean testConnectedJointStart() {
 		boolean present = false;
 
+		if (!(majorLabel == 3 || majorLabel == 4)) return false; // we don't expect higher cases
+
 		for (int u = 0; u < degree.length; u++) {
 			if (degree[u] < majorLabel) {
 
@@ -264,7 +266,7 @@ public class TreeChecker
 								}
 							}
 
-							if (majorCount == 2)
+							if (majorCount == 2 && distTo[u][v] == 2)
 							{
 								return true; // if it's three or more then the earlier case of a minor with three delta neighbors will get it!
 							}
@@ -280,6 +282,8 @@ public class TreeChecker
 	public boolean testTightConnectedJointStart() {
 		boolean present = false;
 
+		if (!(majorLabel == 3 || majorLabel == 4)) return false; // we don't expect higher cases
+
 		for (int u = 0; u < degree.length; u++) {
 			if (degree[u] < majorLabel) {
 				// See if this is the center of one joint star
@@ -310,7 +314,7 @@ public class TreeChecker
 								}
 							}
 
-							if (majorCount == 2)
+							if (majorCount == 2 && distTo[u][v] == 1)
 							{
 								return true; // if it's three or more then the earlier case of a minor with three delta neighbors will get it!
 							}
@@ -352,6 +356,100 @@ public class TreeChecker
 				// 		}
 				// 	}
 				// }
+			}
+		}
+
+		return present;
+	}
+
+	public boolean testForTree_1() 
+	{
+		boolean present = false;
+
+		for (int v1 = 0; v1 < degree.length; v1++) {
+			if (degree[v1] == majorLabel) {
+				for (int v2 = 0; v2 < degree.length; v2++) {
+					if (degree[v2] == majorLabel && v1 != v2) {
+						for (int v3 = 0; v3 < degree.length; v3++) {
+							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+								for (int v4 = 0; v4 < degree.length; v4++) {
+									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+										for (int v5 = 0; v5 < degree.length; v5++) {
+											if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
+												for (int v6 = 0; v6 < degree.length; v6++) {
+													if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
+														// now check the distances... that was absurd... but it guarantees to check all possible majors...
+														if (
+															distTo[v1][v2] == 1 && distTo[v1][v3] == 5 && distTo[v1][v4] == 7 && distTo[v1][v5] == 6 && distTo[v1][v6] == 3 &&
+
+															distTo[v2][v1] == 1 && distTo[v2][v3] == 4 && distTo[v2][v4] == 6 && distTo[v2][v5] == 5 && distTo[v2][v6] == 2 &&
+
+															distTo[v3][v1] == 5 && distTo[v3][v2] == 4 && distTo[v3][v4] == 2 && distTo[v3][v5] == 1 && distTo[v3][v6] == 6 &&
+
+															distTo[v4][v1] == 7 && distTo[v4][v2] == 6 && distTo[v4][v3] == 2 && distTo[v4][v5] == 3 && distTo[v4][v6] == 8 &&
+
+															distTo[v5][v1] == 6 && distTo[v5][v2] == 5 && distTo[v5][v3] == 1 && distTo[v5][v4] == 3 && distTo[v5][v6] == 7 &&
+
+															distTo[v6][v1] == 3 && distTo[v6][v2] == 2 && distTo[v6][v3] == 6 && distTo[v6][v4] == 8 && distTo[v6][v5] == 7 
+															)
+															return true; // PHEW>>>>>>>>
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return present;
+	}
+
+	public boolean testForTree_2() 
+	{
+		boolean present = false;
+
+		for (int v1 = 0; v1 < degree.length; v1++) {
+			if (degree[v1] == majorLabel) {
+				for (int v2 = 0; v2 < degree.length; v2++) {
+					if (degree[v2] == majorLabel && v1 != v2) {
+						for (int v3 = 0; v3 < degree.length; v3++) {
+							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+								for (int v4 = 0; v4 < degree.length; v4++) {
+									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+										for (int v5 = 0; v5 < degree.length; v5++) {
+											if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
+												for (int v6 = 0; v6 < degree.length; v6++) {
+													if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
+														// now check the distances... that was absurd... but it guarantees to check all possible majors...
+														if (
+															distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 7 && distTo[v1][v5] == 8 && distTo[v1][v6] == 10 &&
+
+															distTo[v2][v1] == 2 && distTo[v2][v3] == 1 && distTo[v2][v4] == 5 && distTo[v2][v5] == 6 && distTo[v2][v6] == 8 &&
+
+															distTo[v3][v1] == 3 && distTo[v3][v2] == 1 && distTo[v3][v4] == 4 && distTo[v3][v5] == 5 && distTo[v3][v6] == 7 &&
+
+															distTo[v4][v1] == 7 && distTo[v4][v2] == 5 && distTo[v4][v3] == 4 && distTo[v4][v5] == 1 && distTo[v4][v6] == 3 &&
+
+															distTo[v5][v1] == 8 && distTo[v5][v2] == 6 && distTo[v5][v3] == 5 && distTo[v5][v4] == 1 && distTo[v5][v6] == 2 &&
+
+															distTo[v6][v1] == 10 && distTo[v6][v2] == 8 && distTo[v6][v3] == 7 && distTo[v6][v4] == 3 && distTo[v6][v5] == 2 
+															)
+															return true; // PHEW>>>>>>>>
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -563,11 +661,46 @@ public class TreeChecker
 	public HashSet<Integer> findNeighbors(int v, int distance) {
 		HashSet<Integer> neighbors = new HashSet<Integer>();
 		for (int i = 0; i < dimension; i++) {
-			if (distTo[v][i] == distance) {
+			if (distTo[v][i] == distance && v != i) {
 				neighbors.add(i);
 			}
 		}
 		return neighbors;
+	}
+
+	public boolean checkForGraphs() {
+		boolean present = false;
+		present = testDeltaMinusOneNeighbors();
+		if (present) return true;
+
+		present = testDeltaMinusOneNeighbors();
+		if (present) return true;
+
+		present = testMajorP3();
+		if (present) return true;
+
+		present = testStar();
+		if (present) return true;
+
+		present = testThreeStarD3();
+		if (present) return true;
+
+		present = testThreeStarCloseD3();
+		if (present) return true;
+
+		present = testConnectedJointStart();
+		if (present) return true;
+
+		present = testTightConnectedJointStart();
+		if (present) return true;
+
+		present = testForTree_1(); // WORKS, tested with testForTree_1.amf
+		if (present) return true;
+
+		present = testForTree_2(); // WORKS, tested with testForTree_1.amf
+		if (present) return true;
+
+		return false; // didn't find it earlier...
 	}
 
 	/**
@@ -595,8 +728,8 @@ public class TreeChecker
 		};
 		TreeChecker check = new TreeChecker(testMatrix, 6);
 		HashSet<Integer> fours = check.findNeighbors(0, 4);
-		System.out.println(fours);
-        System.out.println("ASDASD");
+		// System.out.println(fours);
+  //       System.out.println("ASDASD");
 
 
 		// Try to create a buffer reader to parse the adjacency matrix
@@ -622,15 +755,19 @@ public class TreeChecker
 			// TODO: test cases for each of these graphs
 		
 			// Run the property checkers here
-			System.out.println("Dimension = " + dimensions);
+			//System.out.println("Dimension = " + dimensions);
 			TreeChecker checker = new TreeChecker(matrix, dimensions);
-			System.out.println(checker.testDeltaMinusOneNeighbors());
-			System.out.println(checker.testMajorP3());
-			System.out.println(checker.testStar());
-			System.out.println(checker.testThreeStarD3());
-			System.out.println(checker.testThreeStarCloseD3());
-			System.out.println(checker.testConnectedJointStart());
-			// System.out.println(checker.testTightConnectedJointStart());
+			boolean present = checker.checkForGraphs();
+			System.out.println(present);
+
+			// present = checker.testDeltaMinusOneNeighbors();
+			// present = checker.testDeltaMinusOneNeighbors();
+			// present = checker.testMajorP3();
+			// present = checker.testStar();
+			// present = checker.testThreeStarD3();
+			// present = checker.testThreeStarCloseD3();
+			// present = checker.testConnectedJointStart();
+			// present = checker.testTightConnectedJointStart();
 
 
 			//System.out.println(checker.testSplitStar());
