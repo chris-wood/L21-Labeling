@@ -27,6 +27,7 @@ else:
 	
 	# Grab all files...
 	listing = os.listdir(samples)
+	print("Running from " + samples)
 	for file in listing:
 		
 		# Get the extension and check it
@@ -47,8 +48,10 @@ else:
 			
 			# Copy the file over to the correct location for continual or manual inspection
 			if (testPass == True):
-				print("Passed (doesn't contain the forbidden subtree")
+				print("Passed (doesn't contain the forbidden subtree)")
+				print("saving to  " + str(passDir + '/' + file))
 				shutil.copy2(samples + '/' + file, passDir + '/' + file)
 			else:
-				print("Failed (contains the forbidden subtree")
+				print("Failed (contains the forbidden subtree)")
+				print("saving to  " + str(failDir + '/' + file))
 				shutil.copy2(samples + '/' + file, failDir + '/' + file)
