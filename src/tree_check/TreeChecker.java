@@ -105,7 +105,7 @@ public class TreeChecker
 	}
 
 	// three majors connected in a row
-	public boolean testMajorP3()
+	public boolean testMajorP3()  
 	{
 		boolean present = false;
 		
@@ -125,7 +125,7 @@ public class TreeChecker
 						}
 					}
 				}
-				if (deltaNeighbors >= 3) 
+				if (deltaNeighbors >= 2) // FIXED 
 				{
 					return true;
 				}
@@ -144,7 +144,6 @@ public class TreeChecker
 		{
 			if (degree[i] < majorLabel)
 			{
-				// get all 1path neighbors, if there are n >= 3 neighbors, present = true
 				int majorCount = 0;
 				for (int j = 0; j < degree.length; j++) 
 				{
@@ -182,7 +181,7 @@ public class TreeChecker
 				int majorAtThreeCount = 0;
 				for (int j = 0; j < degree.length; j++) 
 				{
-					if (v != j) 
+					if (v != j)
 					{
 						if (distTo[v][j] == 4 && degree[j] == majorLabel) 
 						{
@@ -211,6 +210,7 @@ public class TreeChecker
 			if (degree[v] == majorLabel) // we only expect delta=3 to be victim to these cases, but do majorlabel anyway
 			{
 				int majorAtThreeCount = 0;
+				HashSet<Integer> atThree = new HashSet<Integer>();
 				for (int j = 0; j < degree.length; j++) 
 				{
 					if (v != j) 
@@ -218,10 +218,17 @@ public class TreeChecker
 						if (distTo[v][j] == 4 && degree[j] == majorLabel) 
 						{
 							majorAtThreeCount++;
+							atThree.add(j);
 						}
 					}
 				}
-				if (majorAtThreeCount >= 3) 
+				int majorClose = 0;
+				for (int j = 0; j < degree.length; j++) {
+					if (v != j && !(atThree.contains(j)) && distTo[v][j] == 1 && degree[j] == majorLabel) {
+						majorClose++;
+					}
+				}
+				if (majorAtThreeCount >= 3 && majorClose >= 1) 
 				{
 					return true; 
 				} 
