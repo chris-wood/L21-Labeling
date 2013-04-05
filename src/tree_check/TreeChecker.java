@@ -470,21 +470,113 @@ public class TreeChecker
 									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
 										for (int v5 = 0; v5 < degree.length; v5++) {
 											if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
+												//for (int v6 = 0; v6 < degree.length; v6++) {
+												//	if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
+														// now check the distances... that was absurd... but it guarantees to check all possible majors...
+														if (
+															distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 6 && distTo[v1][v5] == 7 && 
+
+															distTo[v2][v1] == 2 && distTo[v2][v3] == 1 && distTo[v2][v4] == 4 && distTo[v2][v5] == 5 && 
+
+															distTo[v3][v1] == 3 && distTo[v3][v2] == 1 && distTo[v3][v4] == 5 && distTo[v3][v5] == 6 && 
+
+															distTo[v4][v1] == 6 && distTo[v4][v2] == 4 && distTo[v4][v3] == 5 && distTo[v4][v5] == 1 && 
+
+															distTo[v5][v1] == 7 && distTo[v5][v2] == 5 && distTo[v5][v3] == 6 && distTo[v5][v4] == 1 
+															)
+															return true; // PHEW>>>>>>>>
+													//}
+												//}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return present;
+	}
+
+	public boolean testForTree_4() 
+	{
+		boolean present = false;
+
+		for (int v1 = 0; v1 < degree.length; v1++) {
+			if (degree[v1] == majorLabel) {
+				for (int v2 = 0; v2 < degree.length; v2++) {
+					if (degree[v2] == majorLabel && v1 != v2) {
+						for (int v3 = 0; v3 < degree.length; v3++) {
+							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+								for (int v4 = 0; v4 < degree.length; v4++) {
+									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+										for (int v5 = 0; v5 < degree.length; v5++) {
+											if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
 												for (int v6 = 0; v6 < degree.length; v6++) {
 													if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
 														// now check the distances... that was absurd... but it guarantees to check all possible majors...
 														if (
-															distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 6 && distTo[v1][v5] == 7 && distTo[v1][v6] == 9 &&
+															distTo[v1][v2] == 3 && distTo[v1][v3] == 6 && distTo[v1][v4] == 5 && distTo[v1][v5] == 9 && distTo[v1][v6] == 10 &&
 
-															distTo[v2][v1] == 2 && distTo[v2][v3] == 1 && distTo[v2][v4] == 4 && distTo[v2][v5] == 5 && distTo[v2][v6] == 7 &&
+															distTo[v2][v1] == 3 && distTo[v2][v3] == 3 && distTo[v2][v4] == 2 && distTo[v2][v5] == 6 && distTo[v2][v6] == 7 &&
 
-															distTo[v3][v1] == 3 && distTo[v3][v2] == 1 && distTo[v3][v4] == 5 && distTo[v3][v5] == 6 && distTo[v3][v6] == 8 &&
+															distTo[v3][v1] == 6 && distTo[v3][v2] == 3 && distTo[v3][v4] == 1 && distTo[v3][v5] == 5 && distTo[v3][v6] == 6 &&
 
-															distTo[v4][v1] == 6 && distTo[v4][v2] == 4 && distTo[v4][v3] == 5 && distTo[v4][v5] == 1 && distTo[v4][v6] == 3 &&
+															distTo[v4][v1] == 5 && distTo[v4][v2] == 2 && distTo[v4][v3] == 1 && distTo[v4][v5] == 4 && distTo[v4][v6] == 5 &&
 
-															distTo[v5][v1] == 7 && distTo[v5][v2] == 5 && distTo[v5][v3] == 6 && distTo[v5][v4] == 1 && distTo[v5][v6] == 2 &&
+															distTo[v5][v1] == 9 && distTo[v5][v2] == 6 && distTo[v5][v3] == 5 && distTo[v5][v4] == 4 && distTo[v5][v6] == 1 &&
 
-															distTo[v6][v1] == 9 && distTo[v6][v2] == 7 && distTo[v6][v3] == 8 && distTo[v6][v4] == 3 && distTo[v6][v5] == 2 
+															distTo[v6][v1] == 10 && distTo[v6][v2] == 7 && distTo[v6][v3] == 6 && distTo[v6][v4] == 5 && distTo[v6][v5] == 1 
+															)
+															return true; // PHEW>>>>>>>>
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return present;
+	}
+
+	public boolean testForTree_5() 
+	{
+		boolean present = false;
+
+		for (int v1 = 0; v1 < degree.length; v1++) {
+			if (degree[v1] == majorLabel) {
+				for (int v2 = 0; v2 < degree.length; v2++) {
+					if (degree[v2] == majorLabel && v1 != v2) {
+						for (int v3 = 0; v3 < degree.length; v3++) {
+							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+								for (int v4 = 0; v4 < degree.length; v4++) {
+									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+										for (int v5 = 0; v5 < degree.length; v5++) {
+											if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
+												for (int v6 = 0; v6 < degree.length; v6++) {
+													if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
+														// now check the distances... that was absurd... but it guarantees to check all possible majors...
+														if (
+															distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 5 && distTo[v1][v5] == 7 && distTo[v1][v6] == 8 &&
+
+															distTo[v2][v1] == 2 && distTo[v2][v3] == 1 && distTo[v2][v4] == 3 && distTo[v2][v5] == 5 && distTo[v2][v6] == 6 &&
+
+															distTo[v3][v1] == 3 && distTo[v3][v2] == 1 && distTo[v3][v4] == 2 && distTo[v3][v5] == 4 && distTo[v3][v6] == 5 &&
+
+															distTo[v4][v1] == 5 && distTo[v4][v2] == 3 && distTo[v4][v3] == 2 && distTo[v4][v5] == 6 && distTo[v4][v6] == 7 &&
+
+															distTo[v5][v1] == 7 && distTo[v5][v2] == 5 && distTo[v5][v3] == 4 && distTo[v5][v4] == 6 && distTo[v5][v6] == 1 &&
+
+															distTo[v6][v1] == 8 && distTo[v6][v2] == 6 && distTo[v6][v3] == 5 && distTo[v6][v4] == 7 && distTo[v6][v5] == 1 
 															)
 															return true; // PHEW>>>>>>>>
 													}
@@ -748,6 +840,9 @@ public class TreeChecker
 		if (present) return true;
 
 		present = testForTree_3(); // WORKS, tested with testForTree_3.amf
+		if (present) return true;
+
+		present = testForTree_4(); // WORKS, tested with testForTree_3.amf
 		if (present) return true;
 
 		// TODO: TESTS FOR THE REMAINING CASES
