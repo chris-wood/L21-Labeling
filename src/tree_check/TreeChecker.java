@@ -88,9 +88,11 @@ public class TreeChecker
 				int maxVertices = 0;
 				for (Integer tpn : twoNeighbors)
 				{
-					if (degree[tpn] == majorLabel)
-					{
-						maxVertices++;
+					if (tpn != v) {
+						if (degree[tpn] == majorLabel)
+						{
+							maxVertices++;
+						}
 					}
 				}
 				if (maxVertices >= (majorLabel - 1))
@@ -204,37 +206,67 @@ public class TreeChecker
 		if (majorLabel != 3) { // we expect delta=3 to be the case...
 			return false;
 		}
-		
-		for (int v = 0; v < degree.length; v++)
-		{
-			if (degree[v] == majorLabel) // we only expect delta=3 to be victim to these cases, but do majorlabel anyway
-			{
-				int majorAtThreeCount = 0;
-				HashSet<Integer> atThree = new HashSet<Integer>();
-				for (int j = 0; j < degree.length; j++) 
-				{
-					if (v != j) 
-					{
-						if (distTo[v][j] == 4 && degree[j] == majorLabel) 
-						{
-							majorAtThreeCount++;
-							atThree.add(j);
+
+		for (int v1 = 0; v1 < degree.length; v1++) {
+			if (degree[v1] == majorLabel) {
+				for (int v2 = 0; v2 < degree.length; v2++) {
+					if (degree[v2] == majorLabel && v1 != v2) {
+						for (int v3 = 0; v3 < degree.length; v3++) {
+							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+								for (int v4 = 0; v4 < degree.length; v4++) {
+									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+										// now check the distances... that was absurd... but it guarantees to check all possible majors...
+										if (
+											distTo[v1][v2] == 1 && distTo[v1][v3] == 4 && distTo[v1][v4] == 4 && 
+
+											distTo[v2][v1] == 1 && distTo[v2][v3] == 5 && distTo[v2][v4] == 5 && 
+
+											distTo[v3][v1] == 4 && distTo[v3][v2] == 5 && distTo[v3][v4] == 8 && 
+
+											distTo[v4][v1] == 4 && distTo[v4][v2] == 5 && distTo[v4][v3] == 8 
+											)
+											return true; // PHEW>>>>>>>>
+									}
+								}
+							}
 						}
 					}
 				}
-				int majorClose = 0;
-				for (int j = 0; j < degree.length; j++) {
-					if (v != j && !(atThree.contains(j)) && distTo[v][j] == 1 && degree[j] == majorLabel) {
-						majorClose++;
-					}
-				}
-				if (majorAtThreeCount >= 3 && majorClose >= 1) 
-				{
-					return true; 
-				} 
 			}
-		}	
+		}
+
 		return present;
+		
+		// for (int v = 0; v < degree.length; v++)
+		// {
+		// 	if (degree[v] == majorLabel) // we only expect delta=3 to be victim to these cases, but do majorlabel anyway
+		// 	{
+		// 		int majorAtThreeCount = 0;
+		// 		HashSet<Integer> atThree = new HashSet<Integer>();
+		// 		for (int j = 0; j < degree.length; j++) 
+		// 		{
+		// 			if (v != j) 
+		// 			{
+		// 				if (distTo[v][j] == 4 && degree[j] == majorLabel) 
+		// 				{
+		// 					majorAtThreeCount++;
+		// 					atThree.add(j);
+		// 				}
+		// 			}
+		// 		}
+		// 		int majorClose = 0;
+		// 		for (int j = 0; j < degree.length; j++) {
+		// 			if (v != j && !(atThree.contains(j)) && distTo[v][j] == 1 && degree[j] == majorLabel) {
+		// 				majorClose++;
+		// 			}
+		// 		}
+		// 		if (majorAtThreeCount >= 3 && majorClose >= 1) 
+		// 		{
+		// 			return true; 
+		// 		} 
+		// 	}
+		// }	
+		// return present;
 	}
 
 	public boolean testConnectedJointStart() {
@@ -242,46 +274,74 @@ public class TreeChecker
 
 		if (!(majorLabel == 3 || majorLabel == 4)) return false; // we don't expect higher cases
 
-		for (int u = 0; u < degree.length; u++) {
-			if (degree[u] < majorLabel) {
+		for (int v1 = 0; v1 < degree.length; v1++) {
+			if (degree[v1] == majorLabel) {
+				for (int v2 = 0; v2 < degree.length; v2++) {
+					if (degree[v2] == majorLabel && v1 != v2) {
+						for (int v3 = 0; v3 < degree.length; v3++) {
+							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+								for (int v4 = 0; v4 < degree.length; v4++) {
+									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+										// now check the distances... that was absurd... but it guarantees to check all possible majors...
+										if (
+											distTo[v1][v2] == 2 && distTo[v1][v3] == 4 && distTo[v1][v4] == 4 && 
 
-				// See if this is the center of one joint star
-				HashSet<Integer> neighbors = findNeighbors(u, 1);
-				HashSet<Integer> deltas = new HashSet<Integer>();
-				int majorCount = 0;
-				for (Integer n : neighbors)
-				{
-					if (degree[n] == majorLabel)
-					{
-						majorCount++;
-						deltas.add(n);
-					}
-				}
+											distTo[v2][v1] == 2 && distTo[v2][v3] == 4 && distTo[v2][v4] == 4 && 
 
-				// Search for the center of another joint star
-				if (majorCount == 2) {
-					for (int v = 0; v < degree.length; v++) 
-					{
-						if (degree[v] < majorLabel && u != v) {
-							HashSet<Integer> otherNeighbors = findNeighbors(v, 1);
-							majorCount = 0;
-							for (Integer n : neighbors)
-							{
-								if (degree[n] == majorLabel && !deltas.contains(n))
-								{
-									majorCount++;
+											distTo[v3][v1] == 4 && distTo[v3][v2] == 4 && distTo[v3][v4] == 2 && 
+
+											distTo[v4][v1] == 4 && distTo[v4][v2] == 4 && distTo[v4][v3] == 2 
+											)
+											return true; // PHEW>>>>>>>>
+									}
 								}
-							}
-
-							if (majorCount == 2 && distTo[u][v] == 2)
-							{
-								return true; // if it's three or more then the earlier case of a minor with three delta neighbors will get it!
 							}
 						}
 					}
 				}
 			}
 		}
+
+		// for (int u = 0; u < degree.length; u++) {
+		// 	if (degree[u] < majorLabel) {
+
+		// 		// See if this is the center of one joint star
+		// 		HashSet<Integer> neighbors = findNeighbors(u, 1);
+		// 		HashSet<Integer> deltas = new HashSet<Integer>();
+		// 		int majorCount = 0;
+		// 		for (Integer n : neighbors)
+		// 		{
+		// 			if (degree[n] == majorLabel)
+		// 			{
+		// 				majorCount++;
+		// 				deltas.add(n);
+		// 			}
+		// 		}
+
+		// 		// Search for the center of another joint star
+		// 		if (majorCount == 2) {
+		// 			for (int v = 0; v < degree.length; v++) 
+		// 			{
+		// 				if (degree[v] < majorLabel && u != v) {
+		// 					HashSet<Integer> otherNeighbors = findNeighbors(v, 1);
+		// 					majorCount = 0;
+		// 					for (Integer n : neighbors)
+		// 					{
+		// 						if (degree[n] == majorLabel && !deltas.contains(n))
+		// 						{
+		// 							majorCount++;
+		// 						}
+		// 					}
+
+		// 					if (majorCount == 2 && distTo[u][v] == 2)
+		// 					{
+		// 						return true; // if it's three or more then the earlier case of a minor with three delta neighbors will get it!
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
 
 		return present;
 	}
@@ -291,80 +351,108 @@ public class TreeChecker
 
 		if (!(majorLabel == 3 || majorLabel == 4)) return false; // we don't expect higher cases
 
-		for (int u = 0; u < degree.length; u++) {
-			if (degree[u] < majorLabel) {
-				// See if this is the center of one joint star
-				HashSet<Integer> neighbors = findNeighbors(u, 1);
-				HashSet<Integer> deltas = new HashSet<Integer>();
-				int majorCount = 0;
-				for (Integer n : neighbors)
-				{
-					if (degree[n] == majorLabel)
-					{
-						majorCount++;
-						deltas.add(n);
-					}
-				}
+		for (int v1 = 0; v1 < degree.length; v1++) {
+			if (degree[v1] == majorLabel) {
+				for (int v2 = 0; v2 < degree.length; v2++) {
+					if (degree[v2] == majorLabel && v1 != v2) {
+						for (int v3 = 0; v3 < degree.length; v3++) {
+							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+								for (int v4 = 0; v4 < degree.length; v4++) {
+									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+										// now check the distances... that was absurd... but it guarantees to check all possible majors...
+										if (
+											distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 3 && 
 
-				// Search for the center of another joint star
-				if (majorCount == 2) {
-					for (int v = 0; v < degree.length; v++) 
-					{
-						if (degree[v] < majorLabel && u != v) {
-							HashSet<Integer> otherNeighbors = findNeighbors(v, 1);
-							majorCount = 0;
-							for (Integer n : neighbors)
-							{
-								if (degree[n] == majorLabel && !deltas.contains(n))
-								{
-									majorCount++;
+											distTo[v2][v1] == 2 && distTo[v2][v3] == 3 && distTo[v2][v4] == 3 && 
+
+											distTo[v3][v1] == 3 && distTo[v3][v2] == 3 && distTo[v3][v4] == 2 && 
+
+											distTo[v4][v1] == 3 && distTo[v4][v2] == 3 && distTo[v4][v3] == 2 
+											)
+											return true; // PHEW>>>>>>>>
+									}
 								}
-							}
-
-							if (majorCount == 2 && distTo[u][v] == 1)
-							{
-								return true; // if it's three or more then the earlier case of a minor with three delta neighbors will get it!
 							}
 						}
 					}
 				}
-
-
-				// HashSet<Integer> neighbors = findNeighbors(u, 1);
-				// int majorCount = 0;
-				// for (Integer n : neighbors)
-				// {
-				// 	if (degree[n] == majorLabel)
-				// 	{
-				// 		majorCount++;
-				// 	}
-				// }
-
-				// ArrayList<Integer> deltas = new ArrayList<Integer>();
-				// if (majorCount == 2) {
-				// 	HashSet<Integer> threes = findNeighbors(u, 2);
-				// 	int otherMajorCount = 0;
-				// 	for (Integer n : threes)
-				// 	{
-				// 		if (degree[n] == majorLabel)
-				// 		{
-				// 			otherMajorCount++;
-				// 			deltas.add(n);
-				// 		}
-				// 	}
-				// 	if (deltas.size() == 2) {
-				// 		ArrayList<Integer> twos = new ArrayList<Integer>();
-				// 		for (Integer m : deltas) {
-				// 			twos.add(m);
-				// 		}
-				// 		HashSet<Integer> setOfOtherTwos = findNeighbors(twos.get(0), 2);
-				// 		if (setOfOtherTwos.contains(twos.get(1))) {
-				// 			return true;
-				// 		}
-				// 	}
-				// }
 			}
 		}
+
+		// for (int u = 0; u < degree.length; u++) {
+		// 	if (degree[u] < majorLabel) {
+		// 		// See if this is the center of one joint star
+		// 		HashSet<Integer> neighbors = findNeighbors(u, 1);
+		// 		HashSet<Integer> deltas = new HashSet<Integer>();
+		// 		int majorCount = 0;
+		// 		for (Integer n : neighbors)
+		// 		{
+		// 			if (degree[n] == majorLabel)
+		// 			{
+		// 				majorCount++;
+		// 				deltas.add(n);
+		// 			}
+		// 		}
+
+		// 		// Search for the center of another joint star
+		// 		if (majorCount == 2) {
+		// 			for (int v = 0; v < degree.length; v++) 
+		// 			{
+		// 				if (degree[v] < majorLabel && u != v) {
+		// 					HashSet<Integer> otherNeighbors = findNeighbors(v, 1);
+		// 					majorCount = 0;
+		// 					for (Integer n : neighbors)
+		// 					{
+		// 						if (degree[n] == majorLabel && !deltas.contains(n))
+		// 						{
+		// 							majorCount++;
+		// 						}
+		// 					}
+
+		// 					if (majorCount == 2 && distTo[u][v] == 1)
+		// 					{
+		// 						return true; // if it's three or more then the earlier case of a minor with three delta neighbors will get it!
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+
+
+		// 		// HashSet<Integer> neighbors = findNeighbors(u, 1);
+		// 		// int majorCount = 0;
+		// 		// for (Integer n : neighbors)
+		// 		// {
+		// 		// 	if (degree[n] == majorLabel)
+		// 		// 	{
+		// 		// 		majorCount++;
+		// 		// 	}
+		// 		// }
+
+		// 		// ArrayList<Integer> deltas = new ArrayList<Integer>();
+		// 		// if (majorCount == 2) {
+		// 		// 	HashSet<Integer> threes = findNeighbors(u, 2);
+		// 		// 	int otherMajorCount = 0;
+		// 		// 	for (Integer n : threes)
+		// 		// 	{
+		// 		// 		if (degree[n] == majorLabel)
+		// 		// 		{
+		// 		// 			otherMajorCount++;
+		// 		// 			deltas.add(n);
+		// 		// 		}
+		// 		// 	}
+		// 		// 	if (deltas.size() == 2) {
+		// 		// 		ArrayList<Integer> twos = new ArrayList<Integer>();
+		// 		// 		for (Integer m : deltas) {
+		// 		// 			twos.add(m);
+		// 		// 		}
+		// 		// 		HashSet<Integer> setOfOtherTwos = findNeighbors(twos.get(0), 2);
+		// 		// 		if (setOfOtherTwos.contains(twos.get(1))) {
+		// 		// 			return true;
+		// 		// 		}
+		// 		// 	}
+		// 		// }
+		// 	}
+		// }
 
 		return present;
 	}
@@ -590,6 +678,84 @@ public class TreeChecker
 												}
 											}
 										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return present;
+	}
+
+	public boolean testForTree_6() {
+		boolean present = false;
+
+		if (!(majorLabel == 3 || majorLabel == 4)) return false; // we don't expect higher cases
+
+		for (int v1 = 0; v1 < degree.length; v1++) {
+			if (degree[v1] == majorLabel) {
+				for (int v2 = 0; v2 < degree.length; v2++) {
+					if (degree[v2] == majorLabel && v1 != v2) {
+						for (int v3 = 0; v3 < degree.length; v3++) {
+							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+								for (int v4 = 0; v4 < degree.length; v4++) {
+									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+										for (int v5 = 0; v5 < degree.length; v5++) {
+											if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
+												// now check the distances... that was absurd... but it guarantees to check all possible majors...
+												if (
+													distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 7 && distTo[v1][v5] == 9 &&
+
+													distTo[v2][v1] == 2 && distTo[v2][v3] == 1 && distTo[v2][v4] == 5 && distTo[v2][v5] == 7 &&
+
+													distTo[v3][v1] == 3 && distTo[v3][v2] == 1 && distTo[v3][v4] == 6 && distTo[v3][v5] == 8 &&
+
+													distTo[v4][v1] == 7 && distTo[v4][v2] == 5 && distTo[v4][v3] == 6 && distTo[v4][v5] == 2 && 
+
+													distTo[v5][v1] == 9 && distTo[v5][v2] == 7 && distTo[v5][v3] == 8 && distTo[v5][v4] == 2																			
+													)
+													return true; // PHEW>>>>>>>>
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return present;
+	}
+
+	public boolean testForTree_7() {
+		boolean present = false;
+
+		if (!(majorLabel == 3)) return false; // we don't expect higher cases
+
+		for (int v1 = 0; v1 < degree.length; v1++) {
+			if (degree[v1] == majorLabel) {
+				for (int v2 = 0; v2 < degree.length; v2++) {
+					if (degree[v2] == majorLabel && v1 != v2) {
+						for (int v3 = 0; v3 < degree.length; v3++) {
+							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+								for (int v4 = 0; v4 < degree.length; v4++) {
+									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+										// now check the distances... that was absurd... but it guarantees to check all possible majors...
+										if (
+											distTo[v1][v2] == 1 && distTo[v1][v3] == 5 && distTo[v1][v4] == 6 && 
+
+											distTo[v2][v1] == 1 && distTo[v2][v3] == 4 && distTo[v2][v4] == 5 && 
+
+											distTo[v3][v1] == 5 && distTo[v3][v2] == 4 && distTo[v3][v4] == 1 && 
+
+											distTo[v4][v1] == 6 && distTo[v4][v2] == 5 && distTo[v4][v3] == 1 
+											)
+											return true; // PHEW>>>>>>>>
 									}
 								}
 							}
@@ -850,6 +1016,17 @@ public class TreeChecker
 		if (present) return true;
 
 		present = testForTree_4(); // WORKS, tested with testForTree_3.amf
+		if (present) return true;
+
+
+// NO TEST CASES BELOW THIS LINE --- NEED TO WRITE SOME
+		present = testForTree_5(); // UNTESTED
+		if (present) return true;
+
+		present = testForTree_6(); // UNTESTED
+		if (present) return true;
+
+		present = testForTree_7(); // UNTESTED
 		if (present) return true;
 
 		// TODO: TESTS FOR THE REMAINING CASES
