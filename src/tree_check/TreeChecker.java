@@ -768,200 +768,52 @@ public class TreeChecker
 		return present;
 	}
 
+	public boolean testForTree_8() 
+	{
+		boolean present = false;
+
+		for (int v1 = 0; v1 < degree.length; v1++) {
+			if (degree[v1] == majorLabel) {
+				for (int v2 = 0; v2 < degree.length; v2++) {
+					if (degree[v2] == majorLabel && v1 != v2) {
+						for (int v3 = 0; v3 < degree.length; v3++) {
+							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+								for (int v4 = 0; v4 < degree.length; v4++) {
+									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+										for (int v5 = 0; v5 < degree.length; v5++) {
+											if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
+												//for (int v6 = 0; v6 < degree.length; v6++) {
+												//	if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
+														// now check the distances... that was absurd... but it guarantees to check all possible majors...
+														if (
+															distTo[v1][v2] == 1 && distTo[v1][v3] == 5 && distTo[v1][v4] == 9 && distTo[v1][v5] == 10 && 
+
+															distTo[v2][v1] == 1 && distTo[v2][v3] == 4 && distTo[v2][v4] == 8 && distTo[v2][v5] == 9 && 
+
+															distTo[v3][v1] == 5 && distTo[v3][v2] == 4 && distTo[v3][v4] == 4 && distTo[v3][v5] == 5 && 
+
+															distTo[v4][v1] == 9 && distTo[v4][v2] == 8 && distTo[v4][v3] == 4 && distTo[v4][v5] == 1 && 
+
+															distTo[v5][v1] == 10 && distTo[v5][v2] == 9 && distTo[v5][v3] == 5 && distTo[v5][v4] == 1 
+															)
+															return true; // PHEW>>>>>>>>
+													//}
+												//}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return present;
+	}
+
 // END TEST CASES
-	
-	public boolean testSplitStar()
-	{
-		boolean present = false;
-		
-		for (int v = 0; v < degree.length; v++)
-		{
-			if (degree[v] == 3) // we only expect delta=3 to be victim to these cases
-			{
-				HashSet<Integer> ones = findNeighbors(v, 1);
-				HashSet<Integer> threes = findNeighbors(v, 4);
-				HashSet<Integer> fours = findNeighbors(v, 5);
-				
-				int oneCount = 0;
-				int threeCount = 0;
-				int fourCount = 0;
-				
-				for (Integer n : ones)
-				{
-					//System.out.println("ones - " + v + "," + n);
-					if (degree[n] == 3)
-					{
-						//System.out.println(n);
-						oneCount++;
-					}
-				}
-				
-				for (Integer n : threes)
-				{
-					//System.out.println("threes - " + v + "," + n);
-					if (degree[n] == 3)
-					{
-						//System.out.println(n);
-						threeCount++;
-					}
-				}
-				
-				for (Integer n : fours)
-				{
-					//System.out.println("fours - " + v + "," + n);
-					if (degree[n] == 3)
-					{
-						//System.out.println(n);
-						fourCount++;
-					}
-				}
-				
-				if (oneCount >= 1 && threeCount >= 1 && fourCount >= 1)
-				{
-					present = true;
-					return present;
-				}
-			}
-		}
-		
-		return present;
-	}
-	
-	// case where there are two delta-path segments of 3 nodes (i.e. one minor in middle) that 
-	// are connected by the minors
-	public boolean testJoinedDeltaPaths()
-	{
-		boolean present = false;
-		
-		for (int v = 0; v < degree.length; v++)
-		{
-			if (degree[v] == 4) // we only expect delta=4/5 to be victim to these cases
-								// but delta=5 yields n>20 nodes in the tree
-			{
-				HashSet<Integer> twos = findNeighbors(v, 2);
-				HashSet<Integer> threes = findNeighbors(v, 3);
-				
-				boolean oneInTwo = false;
-				for (Integer n : twos)
-				{
-					if (degree[n] == 4)
-					{
-						oneInTwo = true;
-					}
-				}
-				
-				// There is a delta that is two away, not check for the other side
-				if (oneInTwo)
-				{
-					boolean foundOneInThrees = false;
-					for (Integer n : threes)
-					{
-						if (degree[n] == 4)
-						{
-							foundOneInThrees = true;
-							
-							// Now check to see if there is one two away from this delta,
-							// and that it is also in three. if so we have a winner
-							HashSet<Integer> otherTwos = findNeighbors(n, 2);
-							for (Integer vertex : otherTwos)
-							{
-								if (degree[vertex] == 4 && threes.contains(vertex))
-								{
-									present = true;
-									return true;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		return present;
-	}
-	
-	// case where there are two delta-path segments of 3 nodes (i.e. one minor in middle) that 
-	// are connected by the minors (with one more minor in between those two)
-	public boolean testLongerJoinedDeltaPaths()
-	{
-		boolean present = false;
-		
-		for (int v = 0; v < degree.length; v++)
-		{
-			if (degree[v] == 4) // we only expect delta=4/5 to be victim to these cases
-								// but delta=5 yields n>20 nodes in the tree
-			{
-				HashSet<Integer> twos = findNeighbors(v, 2);
-				HashSet<Integer> fours = findNeighbors(v, 3);
-				
-				boolean oneInTwo = false;
-				for (Integer n : twos)
-				{
-					if (degree[n] == 4)
-					{
-						oneInTwo = true;
-					}
-				}
-				
-				// There is a delta that is two away, not check for the other side
-				if (oneInTwo)
-				{
-					boolean foundOneInFours = false;
-					for (Integer n : fours)
-					{
-						if (degree[n] == 4)
-						{
-							foundOneInFours = true;
-							
-							// Now check to see if there is one two away from this delta,
-							// and that it is also in three. if so we have a winner
-							HashSet<Integer> otherTwos = findNeighbors(n, 2);
-							for (Integer vertex : otherTwos)
-							{
-								if (degree[vertex] == 4 && fours.contains(vertex))
-								{
-									present = true;
-									return true;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		return present;
-	}
-	
-	// this is the following tree:
-	// d - d - m - m - m - d - m - m - m - d - d
-	public boolean testJoinedDeltaSegmentsPendant()
-	{
-		boolean present = false;
-		
-		for (int v = 0; v < degree.length; v++)
-		{
-			if (degree[v] == 3) // we only expect delta=4/5 to be victim to these cases
-								// but delta=5 yields n>20 nodes in the tree
-			{
-				HashSet<Integer> fours = findNeighbors(v, 4);
-				HashSet<Integer> fives = findNeighbors(v, 5);
-				
-				boolean twoFours = false;
-				boolean twoFives = false;
-				
-				for (Integer four : fours)
-				{
-					if (degree[four] == 4)
-					{
-						// TODO: continue this, but need a distance method...
-					}
-				}
-			}
-		}
-		
-		return present;
-	}
 	
 	// Determine distance between two vertices...
 	public int distance(int v1, int v2)
@@ -1018,15 +870,18 @@ public class TreeChecker
 		present = testForTree_4(); // WORKS, tested with testForTree_3.amf
 		if (present) return true;
 
-
 // NO TEST CASES BELOW THIS LINE --- NEED TO WRITE SOME
+
 		present = testForTree_5(); // UNTESTED
 		if (present) return true;
 
 		present = testForTree_6(); // UNTESTED
 		if (present) return true;
 
-		present = testForTree_7(); // UNTESTED
+		present = testForTree_7(); // UNTESTED	
+		if (present) return true;
+
+		present = testForTree_8(); // UNTESTED
 		if (present) return true;
 
 		// TODO: TESTS FOR THE REMAINING CASES
