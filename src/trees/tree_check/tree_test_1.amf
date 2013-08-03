@@ -1,0 +1,9 @@
+5
+0 1 0 0 0
+1 0 1 0 0
+0 1 0 1 0
+0 0 1 0 1
+0 0 0 1 0
+
+Test case #1
+- T contains an induced P3 consisting of three major vertices.

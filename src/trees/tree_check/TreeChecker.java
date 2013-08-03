@@ -75,61 +75,27 @@ public class TreeChecker
 	
 // TEST CASES!!!
 
-	// a single major vertex who has delta-1 neighbors at distance 2
-	public boolean testDeltaMinusOneNeighbors()
-	{
-		boolean present = false;
-		
-		for (int v = 0; v < degree.length; v++)
-		{
-			if (degree[v] == majorLabel)
-			{
-				HashSet<Integer> twoNeighbors = findNeighbors(v, 2);
-				int maxVertices = 0;
-				for (Integer tpn : twoNeighbors)
-				{
-					if (tpn != v) {
-						if (degree[tpn] == majorLabel)
-						{
-							maxVertices++;
-						}
-					}
-				}
-				if (maxVertices >= (majorLabel - 1))
-				{
-					present = true;
-					return true;
-				}
-			}
-		}
-		
-		return present;
-	}
-
 	// three majors connected in a row
-	public boolean testMajorP3()  
+	public boolean test_for_tree_1()  
 	{
 		boolean present = false;
+
+		System.out.println("Checking for p3");
 		
 		// Search all major vertices
-		for (int i = 0; i < degree.length; i++)
-		{
-			if (degree[i] == majorLabel)
-			{
-				int deltaNeighbors = 0;
-				for (int j = 0; j < degree.length; j++) 
-				{
-					if (i != j) 
-					{
-						if (distTo[i][j] == 1 && degree[j] == majorLabel)
-						{
-							deltaNeighbors++;
+		for (int v1 = 0; v1 < degree.length; v1++) {
+			if (degree[v1] == majorLabel) {
+				for (int v2 = 0; v2 < degree.length; v2++) {
+					if (degree[v2] == majorLabel && v1 != v2) {
+						for (int v3 = 0; v3 < degree.length; v3++) {
+							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+								if (distTo[v1][v2] == 1 && distTo[v1][v3] == 2 && distTo[v2][v3] == 1)
+								{
+									return true;
+								}
+							}
 						}
 					}
-				}
-				if (deltaNeighbors >= 2) // FIXED 
-				{
-					return true;
 				}
 			}
 		}
@@ -138,680 +104,556 @@ public class TreeChecker
 	}
 
 	// minor in the middle connected to three or more majors
-	public boolean testStar()
+	public boolean test_for_tree_2()
 	{
 		boolean present = false;
 		
-		for (int i = 0; i < degree.length; i++)
-		{
-			if (degree[i] < majorLabel)
-			{
-				int majorCount = 0;
-				for (int j = 0; j < degree.length; j++) 
-				{
-					if (i != j)
-					{
-						if (degree[j] == majorLabel && distTo[i][j] == 1)
-						{
-							majorCount++;
+		for (int v1 = 0; v1 < degree.length; v1++) {
+			if (degree[v1] == majorLabel) {
+				for (int v2 = 0; v2 < degree.length; v2++) {
+					if (degree[v2] == majorLabel && v1 != v2) {
+						for (int v3 = 0; v3 < degree.length; v3++) {
+							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+								for (int center = 0; center < degree.length; center++) {
+									if (degree[center] < majorLabel && center != v3 && center != v2 && center != v1) {
+										if (distTo[center][v1] == 1 && distTo[center][v2] == 1 && distTo[center][v3] == 1 && 
+											distTo[v1][v2] == 2 && distTo[v1][v3] == 2 && distTo[v2][v3] == 2) {
+											return true;
+										}
+									}
+								}
+							}
 						}
 					}
 				}
-				if (majorCount >= 3)
+			}
+		}
+		
+		return present;
+	}
+
+	public boolean test_for_tree_3()
+	{
+		boolean present = false;
+
+		for (int v = 0; v < degree.length; v++)
+		{
+			if (degree[v] == majorLabel) // the center major vertex
+			{
+				HashSet<Integer> twoNeighbors = findNeighbors(v, 2); // find all vertices in N2(v)
+				int maxVertices = 0;
+				for (Integer tpn : twoNeighbors) 
 				{
-					System.out.println("vertex = " + i);
+					if (tpn != v && degree[tpn] == majorLabel) // count major vertices in N2(v)
+					{
+						maxVertices++;
+					}
+				}
+				if (maxVertices >= (majorLabel - 1))
+				{
 					return true;
 				}
 			}
 		}
-		
+
 		return present;
 	}
 
 // same forbidden subtree as in build3 algorithm, and also the algorithm 
-	public boolean testThreeStarD3()
-	{
-		boolean present = false;
-		if (majorLabel != 3) { // we expect delta=3 to be the case...
-			return false;
-		}
+	// public boolean testThreeStarD3()
+	// {
+	// 	boolean present = false;
+	// 	if (majorLabel != 3) { // we expect delta=3 to be the case...
+	// 		return false;
+	// 	}
 		
-		for (int v = 0; v < degree.length; v++)
-		{
-			if (degree[v] == majorLabel) // we only expect delta=3 to be victim to these cases, but do majorlabel anyway
-			{
-				int majorAtThreeCount = 0;
-				for (int j = 0; j < degree.length; j++) 
-				{
-					if (v != j)
-					{
-						if (distTo[v][j] == 4 && degree[j] == majorLabel) 
-						{
-							majorAtThreeCount++;
-						}
-					}
-				}
-				if (majorAtThreeCount >= 3) 
-				{
-					return true; 
-				} 
-			}
-		}	
-		return present;
-	}
+	// 	for (int v = 0; v < degree.length; v++)
+	// 	{
+	// 		if (degree[v] == majorLabel) // we only expect delta=3 to be victim to these cases, but do majorlabel anyway
+	// 		{
+	// 			int majorAtThreeCount = 0;
+	// 			for (int j = 0; j < degree.length; j++) 
+	// 			{
+	// 				if (v != j)
+	// 				{
+	// 					if (distTo[v][j] == 4 && degree[j] == majorLabel) 
+	// 					{
+	// 						majorAtThreeCount++;
+	// 					}
+	// 				}
+	// 			}
+	// 			if (majorAtThreeCount >= 3) 
+	// 			{
+	// 				return true; 
+	// 			} 
+	// 		}
+	// 	}	
+	// 	return present;
+	// }
 // same as above but the center has a delta neighbor and then is the endpoint for two delta-segments of length 4
-	public boolean testThreeStarCloseD3()
-	{
-		boolean present = false;
-		if (majorLabel != 3) { // we expect delta=3 to be the case...
-			return false;
-		}
-
-		for (int v1 = 0; v1 < degree.length; v1++) {
-			if (degree[v1] == majorLabel) {
-				for (int v2 = 0; v2 < degree.length; v2++) {
-					if (degree[v2] == majorLabel && v1 != v2) {
-						for (int v3 = 0; v3 < degree.length; v3++) {
-							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
-								for (int v4 = 0; v4 < degree.length; v4++) {
-									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
-										// now check the distances... that was absurd... but it guarantees to check all possible majors...
-										if (
-											distTo[v1][v2] == 1 && distTo[v1][v3] == 4 && distTo[v1][v4] == 4 && 
-
-											distTo[v2][v1] == 1 && distTo[v2][v3] == 5 && distTo[v2][v4] == 5 && 
-
-											distTo[v3][v1] == 4 && distTo[v3][v2] == 5 && distTo[v3][v4] == 8 && 
-
-											distTo[v4][v1] == 4 && distTo[v4][v2] == 5 && distTo[v4][v3] == 8 
-											)
-											return true; // PHEW>>>>>>>>
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return present;
-		
-		// for (int v = 0; v < degree.length; v++)
-		// {
-		// 	if (degree[v] == majorLabel) // we only expect delta=3 to be victim to these cases, but do majorlabel anyway
-		// 	{
-		// 		int majorAtThreeCount = 0;
-		// 		HashSet<Integer> atThree = new HashSet<Integer>();
-		// 		for (int j = 0; j < degree.length; j++) 
-		// 		{
-		// 			if (v != j) 
-		// 			{
-		// 				if (distTo[v][j] == 4 && degree[j] == majorLabel) 
-		// 				{
-		// 					majorAtThreeCount++;
-		// 					atThree.add(j);
-		// 				}
-		// 			}
-		// 		}
-		// 		int majorClose = 0;
-		// 		for (int j = 0; j < degree.length; j++) {
-		// 			if (v != j && !(atThree.contains(j)) && distTo[v][j] == 1 && degree[j] == majorLabel) {
-		// 				majorClose++;
-		// 			}
-		// 		}
-		// 		if (majorAtThreeCount >= 3 && majorClose >= 1) 
-		// 		{
-		// 			return true; 
-		// 		} 
-		// 	}
-		// }	
-		// return present;
-	}
-
-	public boolean testConnectedJointStart() {
-		boolean present = false;
-
-		if (!(majorLabel == 3 || majorLabel == 4)) return false; // we don't expect higher cases
-
-		for (int v1 = 0; v1 < degree.length; v1++) {
-			if (degree[v1] == majorLabel) {
-				for (int v2 = 0; v2 < degree.length; v2++) {
-					if (degree[v2] == majorLabel && v1 != v2) {
-						for (int v3 = 0; v3 < degree.length; v3++) {
-							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
-								for (int v4 = 0; v4 < degree.length; v4++) {
-									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
-										// now check the distances... that was absurd... but it guarantees to check all possible majors...
-										if (
-											distTo[v1][v2] == 2 && distTo[v1][v3] == 4 && distTo[v1][v4] == 4 && 
-
-											distTo[v2][v1] == 2 && distTo[v2][v3] == 4 && distTo[v2][v4] == 4 && 
-
-											distTo[v3][v1] == 4 && distTo[v3][v2] == 4 && distTo[v3][v4] == 2 && 
-
-											distTo[v4][v1] == 4 && distTo[v4][v2] == 4 && distTo[v4][v3] == 2 
-											)
-											return true; // PHEW>>>>>>>>
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		// for (int u = 0; u < degree.length; u++) {
-		// 	if (degree[u] < majorLabel) {
-
-		// 		// See if this is the center of one joint star
-		// 		HashSet<Integer> neighbors = findNeighbors(u, 1);
-		// 		HashSet<Integer> deltas = new HashSet<Integer>();
-		// 		int majorCount = 0;
-		// 		for (Integer n : neighbors)
-		// 		{
-		// 			if (degree[n] == majorLabel)
-		// 			{
-		// 				majorCount++;
-		// 				deltas.add(n);
-		// 			}
-		// 		}
-
-		// 		// Search for the center of another joint star
-		// 		if (majorCount == 2) {
-		// 			for (int v = 0; v < degree.length; v++) 
-		// 			{
-		// 				if (degree[v] < majorLabel && u != v) {
-		// 					HashSet<Integer> otherNeighbors = findNeighbors(v, 1);
-		// 					majorCount = 0;
-		// 					for (Integer n : neighbors)
-		// 					{
-		// 						if (degree[n] == majorLabel && !deltas.contains(n))
-		// 						{
-		// 							majorCount++;
-		// 						}
-		// 					}
-
-		// 					if (majorCount == 2 && distTo[u][v] == 2)
-		// 					{
-		// 						return true; // if it's three or more then the earlier case of a minor with three delta neighbors will get it!
-		// 					}
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// }
-
-		return present;
-	}
-
-	public boolean testTightConnectedJointStart() {
-		boolean present = false;
-
-		if (!(majorLabel == 3 || majorLabel == 4)) return false; // we don't expect higher cases
-
-		for (int v1 = 0; v1 < degree.length; v1++) {
-			if (degree[v1] == majorLabel) {
-				for (int v2 = 0; v2 < degree.length; v2++) {
-					if (degree[v2] == majorLabel && v1 != v2) {
-						for (int v3 = 0; v3 < degree.length; v3++) {
-							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
-								for (int v4 = 0; v4 < degree.length; v4++) {
-									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
-										// now check the distances... that was absurd... but it guarantees to check all possible majors...
-										if (
-											distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 3 && 
-
-											distTo[v2][v1] == 2 && distTo[v2][v3] == 3 && distTo[v2][v4] == 3 && 
-
-											distTo[v3][v1] == 3 && distTo[v3][v2] == 3 && distTo[v3][v4] == 2 && 
-
-											distTo[v4][v1] == 3 && distTo[v4][v2] == 3 && distTo[v4][v3] == 2 
-											)
-											return true; // PHEW>>>>>>>>
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		// for (int u = 0; u < degree.length; u++) {
-		// 	if (degree[u] < majorLabel) {
-		// 		// See if this is the center of one joint star
-		// 		HashSet<Integer> neighbors = findNeighbors(u, 1);
-		// 		HashSet<Integer> deltas = new HashSet<Integer>();
-		// 		int majorCount = 0;
-		// 		for (Integer n : neighbors)
-		// 		{
-		// 			if (degree[n] == majorLabel)
-		// 			{
-		// 				majorCount++;
-		// 				deltas.add(n);
-		// 			}
-		// 		}
-
-		// 		// Search for the center of another joint star
-		// 		if (majorCount == 2) {
-		// 			for (int v = 0; v < degree.length; v++) 
-		// 			{
-		// 				if (degree[v] < majorLabel && u != v) {
-		// 					HashSet<Integer> otherNeighbors = findNeighbors(v, 1);
-		// 					majorCount = 0;
-		// 					for (Integer n : neighbors)
-		// 					{
-		// 						if (degree[n] == majorLabel && !deltas.contains(n))
-		// 						{
-		// 							majorCount++;
-		// 						}
-		// 					}
-
-		// 					if (majorCount == 2 && distTo[u][v] == 1)
-		// 					{
-		// 						return true; // if it's three or more then the earlier case of a minor with three delta neighbors will get it!
-		// 					}
-		// 				}
-		// 			}
-		// 		}
-
-
-		// 		// HashSet<Integer> neighbors = findNeighbors(u, 1);
-		// 		// int majorCount = 0;
-		// 		// for (Integer n : neighbors)
-		// 		// {
-		// 		// 	if (degree[n] == majorLabel)
-		// 		// 	{
-		// 		// 		majorCount++;
-		// 		// 	}
-		// 		// }
-
-		// 		// ArrayList<Integer> deltas = new ArrayList<Integer>();
-		// 		// if (majorCount == 2) {
-		// 		// 	HashSet<Integer> threes = findNeighbors(u, 2);
-		// 		// 	int otherMajorCount = 0;
-		// 		// 	for (Integer n : threes)
-		// 		// 	{
-		// 		// 		if (degree[n] == majorLabel)
-		// 		// 		{
-		// 		// 			otherMajorCount++;
-		// 		// 			deltas.add(n);
-		// 		// 		}
-		// 		// 	}
-		// 		// 	if (deltas.size() == 2) {
-		// 		// 		ArrayList<Integer> twos = new ArrayList<Integer>();
-		// 		// 		for (Integer m : deltas) {
-		// 		// 			twos.add(m);
-		// 		// 		}
-		// 		// 		HashSet<Integer> setOfOtherTwos = findNeighbors(twos.get(0), 2);
-		// 		// 		if (setOfOtherTwos.contains(twos.get(1))) {
-		// 		// 			return true;
-		// 		// 		}
-		// 		// 	}
-		// 		// }
-		// 	}
-		// }
-
-		return present;
-	}
-
-	public boolean testForTree_1() 
-	{
-		boolean present = false;
-
-		for (int v1 = 0; v1 < degree.length; v1++) {
-			if (degree[v1] == majorLabel) {
-				for (int v2 = 0; v2 < degree.length; v2++) {
-					if (degree[v2] == majorLabel && v1 != v2) {
-						for (int v3 = 0; v3 < degree.length; v3++) {
-							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
-								for (int v4 = 0; v4 < degree.length; v4++) {
-									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
-										for (int v5 = 0; v5 < degree.length; v5++) {
-											if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
-												for (int v6 = 0; v6 < degree.length; v6++) {
-													if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
-														// now check the distances... that was absurd... but it guarantees to check all possible majors...
-														if (
-															distTo[v1][v2] == 1 && distTo[v1][v3] == 5 && distTo[v1][v4] == 7 && distTo[v1][v5] == 6 && distTo[v1][v6] == 3 &&
-
-															distTo[v2][v1] == 1 && distTo[v2][v3] == 4 && distTo[v2][v4] == 6 && distTo[v2][v5] == 5 && distTo[v2][v6] == 2 &&
-
-															distTo[v3][v1] == 5 && distTo[v3][v2] == 4 && distTo[v3][v4] == 2 && distTo[v3][v5] == 1 && distTo[v3][v6] == 6 &&
-
-															distTo[v4][v1] == 7 && distTo[v4][v2] == 6 && distTo[v4][v3] == 2 && distTo[v4][v5] == 3 && distTo[v4][v6] == 8 &&
-
-															distTo[v5][v1] == 6 && distTo[v5][v2] == 5 && distTo[v5][v3] == 1 && distTo[v5][v4] == 3 && distTo[v5][v6] == 7 &&
-
-															distTo[v6][v1] == 3 && distTo[v6][v2] == 2 && distTo[v6][v3] == 6 && distTo[v6][v4] == 8 && distTo[v6][v5] == 7 
-															)
-															return true; // PHEW>>>>>>>>
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return present;
-	}
-
-	public boolean testForTree_2() 
-	{
-		boolean present = false;
-
-		for (int v1 = 0; v1 < degree.length; v1++) {
-			if (degree[v1] == majorLabel) {
-				for (int v2 = 0; v2 < degree.length; v2++) {
-					if (degree[v2] == majorLabel && v1 != v2) {
-						for (int v3 = 0; v3 < degree.length; v3++) {
-							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
-								for (int v4 = 0; v4 < degree.length; v4++) {
-									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
-										for (int v5 = 0; v5 < degree.length; v5++) {
-											if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
-												for (int v6 = 0; v6 < degree.length; v6++) {
-													if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
-														// now check the distances... that was absurd... but it guarantees to check all possible majors...
-														if (
-															distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 7 && distTo[v1][v5] == 8 && distTo[v1][v6] == 10 &&
-
-															distTo[v2][v1] == 2 && distTo[v2][v3] == 1 && distTo[v2][v4] == 5 && distTo[v2][v5] == 6 && distTo[v2][v6] == 8 &&
-
-															distTo[v3][v1] == 3 && distTo[v3][v2] == 1 && distTo[v3][v4] == 4 && distTo[v3][v5] == 5 && distTo[v3][v6] == 7 &&
-
-															distTo[v4][v1] == 7 && distTo[v4][v2] == 5 && distTo[v4][v3] == 4 && distTo[v4][v5] == 1 && distTo[v4][v6] == 3 &&
-
-															distTo[v5][v1] == 8 && distTo[v5][v2] == 6 && distTo[v5][v3] == 5 && distTo[v5][v4] == 1 && distTo[v5][v6] == 2 &&
-
-															distTo[v6][v1] == 10 && distTo[v6][v2] == 8 && distTo[v6][v3] == 7 && distTo[v6][v4] == 3 && distTo[v6][v5] == 2 
-															)
-															return true; // PHEW>>>>>>>>
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return present;
-	}
-
-	public boolean testForTree_3() 
-	{
-		boolean present = false;
-
-		for (int v1 = 0; v1 < degree.length; v1++) {
-			if (degree[v1] == majorLabel) {
-				for (int v2 = 0; v2 < degree.length; v2++) {
-					if (degree[v2] == majorLabel && v1 != v2) {
-						for (int v3 = 0; v3 < degree.length; v3++) {
-							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
-								for (int v4 = 0; v4 < degree.length; v4++) {
-									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
-										for (int v5 = 0; v5 < degree.length; v5++) {
-											if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
-												//for (int v6 = 0; v6 < degree.length; v6++) {
-												//	if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
-														// now check the distances... that was absurd... but it guarantees to check all possible majors...
-														if (
-															distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 6 && distTo[v1][v5] == 7 && 
-
-															distTo[v2][v1] == 2 && distTo[v2][v3] == 1 && distTo[v2][v4] == 4 && distTo[v2][v5] == 5 && 
-
-															distTo[v3][v1] == 3 && distTo[v3][v2] == 1 && distTo[v3][v4] == 5 && distTo[v3][v5] == 6 && 
-
-															distTo[v4][v1] == 6 && distTo[v4][v2] == 4 && distTo[v4][v3] == 5 && distTo[v4][v5] == 1 && 
-
-															distTo[v5][v1] == 7 && distTo[v5][v2] == 5 && distTo[v5][v3] == 6 && distTo[v5][v4] == 1 
-															)
-															return true; // PHEW>>>>>>>>
-													//}
-												//}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return present;
-	}
-
-	public boolean testForTree_4() 
-	{
-		boolean present = false;
-
-		for (int v1 = 0; v1 < degree.length; v1++) {
-			if (degree[v1] == majorLabel) {
-				for (int v2 = 0; v2 < degree.length; v2++) {
-					if (degree[v2] == majorLabel && v1 != v2) {
-						for (int v3 = 0; v3 < degree.length; v3++) {
-							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
-								for (int v4 = 0; v4 < degree.length; v4++) {
-									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
-										for (int v5 = 0; v5 < degree.length; v5++) {
-											if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
-												for (int v6 = 0; v6 < degree.length; v6++) {
-													if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
-														// now check the distances... that was absurd... but it guarantees to check all possible majors...
-														if (
-															distTo[v1][v2] == 3 && distTo[v1][v3] == 6 && distTo[v1][v4] == 5 && distTo[v1][v5] == 9 && distTo[v1][v6] == 10 &&
-
-															distTo[v2][v1] == 3 && distTo[v2][v3] == 3 && distTo[v2][v4] == 2 && distTo[v2][v5] == 6 && distTo[v2][v6] == 7 &&
-
-															distTo[v3][v1] == 6 && distTo[v3][v2] == 3 && distTo[v3][v4] == 1 && distTo[v3][v5] == 5 && distTo[v3][v6] == 6 &&
-
-															distTo[v4][v1] == 5 && distTo[v4][v2] == 2 && distTo[v4][v3] == 1 && distTo[v4][v5] == 4 && distTo[v4][v6] == 5 &&
-
-															distTo[v5][v1] == 9 && distTo[v5][v2] == 6 && distTo[v5][v3] == 5 && distTo[v5][v4] == 4 && distTo[v5][v6] == 1 &&
-
-															distTo[v6][v1] == 10 && distTo[v6][v2] == 7 && distTo[v6][v3] == 6 && distTo[v6][v4] == 5 && distTo[v6][v5] == 1 
-															)
-															return true; // PHEW>>>>>>>>
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return present;
-	}
-
-	public boolean testForTree_5() 
-	{
-		boolean present = false;
-
-		for (int v1 = 0; v1 < degree.length; v1++) {
-			if (degree[v1] == majorLabel) {
-				for (int v2 = 0; v2 < degree.length; v2++) {
-					if (degree[v2] == majorLabel && v1 != v2) {
-						for (int v3 = 0; v3 < degree.length; v3++) {
-							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
-								for (int v4 = 0; v4 < degree.length; v4++) {
-									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
-										for (int v5 = 0; v5 < degree.length; v5++) {
-											if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
-												for (int v6 = 0; v6 < degree.length; v6++) {
-													if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
-														// now check the distances... that was absurd... but it guarantees to check all possible majors...
-														if (
-															distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 5 && distTo[v1][v5] == 7 && distTo[v1][v6] == 8 &&
-
-															distTo[v2][v1] == 2 && distTo[v2][v3] == 1 && distTo[v2][v4] == 3 && distTo[v2][v5] == 5 && distTo[v2][v6] == 6 &&
-
-															distTo[v3][v1] == 3 && distTo[v3][v2] == 1 && distTo[v3][v4] == 2 && distTo[v3][v5] == 4 && distTo[v3][v6] == 5 &&
-
-															distTo[v4][v1] == 5 && distTo[v4][v2] == 3 && distTo[v4][v3] == 2 && distTo[v4][v5] == 6 && distTo[v4][v6] == 7 &&
-
-															distTo[v5][v1] == 7 && distTo[v5][v2] == 5 && distTo[v5][v3] == 4 && distTo[v5][v4] == 6 && distTo[v5][v6] == 1 &&
-
-															distTo[v6][v1] == 8 && distTo[v6][v2] == 6 && distTo[v6][v3] == 5 && distTo[v6][v4] == 7 && distTo[v6][v5] == 1 
-															)
-															return true; // PHEW>>>>>>>>
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return present;
-	}
-
-	public boolean testForTree_6() {
-		boolean present = false;
-
-		if (!(majorLabel == 3 || majorLabel == 4)) return false; // we don't expect higher cases
-
-		for (int v1 = 0; v1 < degree.length; v1++) {
-			if (degree[v1] == majorLabel) {
-				for (int v2 = 0; v2 < degree.length; v2++) {
-					if (degree[v2] == majorLabel && v1 != v2) {
-						for (int v3 = 0; v3 < degree.length; v3++) {
-							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
-								for (int v4 = 0; v4 < degree.length; v4++) {
-									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
-										for (int v5 = 0; v5 < degree.length; v5++) {
-											if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
-												// now check the distances... that was absurd... but it guarantees to check all possible majors...
-												if (
-													distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 7 && distTo[v1][v5] == 9 &&
-
-													distTo[v2][v1] == 2 && distTo[v2][v3] == 1 && distTo[v2][v4] == 5 && distTo[v2][v5] == 7 &&
-
-													distTo[v3][v1] == 3 && distTo[v3][v2] == 1 && distTo[v3][v4] == 6 && distTo[v3][v5] == 8 &&
-
-													distTo[v4][v1] == 7 && distTo[v4][v2] == 5 && distTo[v4][v3] == 6 && distTo[v4][v5] == 2 && 
-
-													distTo[v5][v1] == 9 && distTo[v5][v2] == 7 && distTo[v5][v3] == 8 && distTo[v5][v4] == 2																			
-													)
-													return true; // PHEW>>>>>>>>
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return present;
-	}
-
-	public boolean testForTree_7() {
-		boolean present = false;
-
-		if (!(majorLabel == 3)) return false; // we don't expect higher cases
-
-		for (int v1 = 0; v1 < degree.length; v1++) {
-			if (degree[v1] == majorLabel) {
-				for (int v2 = 0; v2 < degree.length; v2++) {
-					if (degree[v2] == majorLabel && v1 != v2) {
-						for (int v3 = 0; v3 < degree.length; v3++) {
-							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
-								for (int v4 = 0; v4 < degree.length; v4++) {
-									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
-										// now check the distances... that was absurd... but it guarantees to check all possible majors...
-										if (
-											distTo[v1][v2] == 1 && distTo[v1][v3] == 5 && distTo[v1][v4] == 6 && 
-
-											distTo[v2][v1] == 1 && distTo[v2][v3] == 4 && distTo[v2][v4] == 5 && 
-
-											distTo[v3][v1] == 5 && distTo[v3][v2] == 4 && distTo[v3][v4] == 1 && 
-
-											distTo[v4][v1] == 6 && distTo[v4][v2] == 5 && distTo[v4][v3] == 1 
-											)
-											return true; // PHEW>>>>>>>>
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return present;
-	}
-
-	public boolean testForTree_8() 
-	{
-		boolean present = false;
-
-		for (int v1 = 0; v1 < degree.length; v1++) {
-			if (degree[v1] == majorLabel) {
-				for (int v2 = 0; v2 < degree.length; v2++) {
-					if (degree[v2] == majorLabel && v1 != v2) {
-						for (int v3 = 0; v3 < degree.length; v3++) {
-							if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
-								for (int v4 = 0; v4 < degree.length; v4++) {
-									if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
-										for (int v5 = 0; v5 < degree.length; v5++) {
-											if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
-												//for (int v6 = 0; v6 < degree.length; v6++) {
-												//	if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
-														// now check the distances... that was absurd... but it guarantees to check all possible majors...
-														if (
-															distTo[v1][v2] == 1 && distTo[v1][v3] == 5 && distTo[v1][v4] == 9 && distTo[v1][v5] == 10 && 
-
-															distTo[v2][v1] == 1 && distTo[v2][v3] == 4 && distTo[v2][v4] == 8 && distTo[v2][v5] == 9 && 
-
-															distTo[v3][v1] == 5 && distTo[v3][v2] == 4 && distTo[v3][v4] == 4 && distTo[v3][v5] == 5 && 
-
-															distTo[v4][v1] == 9 && distTo[v4][v2] == 8 && distTo[v4][v3] == 4 && distTo[v4][v5] == 1 && 
-
-															distTo[v5][v1] == 10 && distTo[v5][v2] == 9 && distTo[v5][v3] == 5 && distTo[v5][v4] == 1 
-															)
-															return true; // PHEW>>>>>>>>
-													//}
-												//}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return present;
-	}
+	// public boolean testThreeStarCloseD3()
+	// {
+	// 	boolean present = false;
+	// 	if (majorLabel != 3) { // we expect delta=3 to be the case...
+	// 		return false;
+	// 	}
+
+	// 	for (int v1 = 0; v1 < degree.length; v1++) {
+	// 		if (degree[v1] == majorLabel) {
+	// 			for (int v2 = 0; v2 < degree.length; v2++) {
+	// 				if (degree[v2] == majorLabel && v1 != v2) {
+	// 					for (int v3 = 0; v3 < degree.length; v3++) {
+	// 						if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+	// 							for (int v4 = 0; v4 < degree.length; v4++) {
+	// 								if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+	// 									// now check the distances... that was absurd... but it guarantees to check all possible majors...
+	// 									if (
+	// 										distTo[v1][v2] == 1 && distTo[v1][v3] == 4 && distTo[v1][v4] == 4 && 
+
+	// 										distTo[v2][v1] == 1 && distTo[v2][v3] == 5 && distTo[v2][v4] == 5 && 
+
+	// 										distTo[v3][v1] == 4 && distTo[v3][v2] == 5 && distTo[v3][v4] == 8 && 
+
+	// 										distTo[v4][v1] == 4 && distTo[v4][v2] == 5 && distTo[v4][v3] == 8 
+	// 										)
+	// 										return true; // PHEW>>>>>>>>
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return present;
+	// }
+
+	// public boolean testConnectedJointStart() {
+	// 	boolean present = false;
+
+	// 	if (!(majorLabel == 3 || majorLabel == 4)) return false; // we don't expect higher cases
+
+	// 	for (int v1 = 0; v1 < degree.length; v1++) {
+	// 		if (degree[v1] == majorLabel) {
+	// 			for (int v2 = 0; v2 < degree.length; v2++) {
+	// 				if (degree[v2] == majorLabel && v1 != v2) {
+	// 					for (int v3 = 0; v3 < degree.length; v3++) {
+	// 						if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+	// 							for (int v4 = 0; v4 < degree.length; v4++) {
+	// 								if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+	// 									// now check the distances... that was absurd... but it guarantees to check all possible majors...
+	// 									if (
+	// 										distTo[v1][v2] == 2 && distTo[v1][v3] == 4 && distTo[v1][v4] == 4 && 
+
+	// 										distTo[v2][v1] == 2 && distTo[v2][v3] == 4 && distTo[v2][v4] == 4 && 
+
+	// 										distTo[v3][v1] == 4 && distTo[v3][v2] == 4 && distTo[v3][v4] == 2 && 
+
+	// 										distTo[v4][v1] == 4 && distTo[v4][v2] == 4 && distTo[v4][v3] == 2 
+	// 										)
+	// 										return true; // PHEW>>>>>>>>
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return present;
+	// }
+
+	// public boolean testTightConnectedJointStart() {
+	// 	boolean present = false;
+
+	// 	if (!(majorLabel == 3 || majorLabel == 4)) return false; // we don't expect higher cases
+
+	// 	for (int v1 = 0; v1 < degree.length; v1++) {
+	// 		if (degree[v1] == majorLabel) {
+	// 			for (int v2 = 0; v2 < degree.length; v2++) {
+	// 				if (degree[v2] == majorLabel && v1 != v2) {
+	// 					for (int v3 = 0; v3 < degree.length; v3++) {
+	// 						if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+	// 							for (int v4 = 0; v4 < degree.length; v4++) {
+	// 								if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+	// 									// now check the distances... that was absurd... but it guarantees to check all possible majors...
+	// 									if (
+	// 										distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 3 && 
+
+	// 										distTo[v2][v1] == 2 && distTo[v2][v3] == 3 && distTo[v2][v4] == 3 && 
+
+	// 										distTo[v3][v1] == 3 && distTo[v3][v2] == 3 && distTo[v3][v4] == 2 && 
+
+	// 										distTo[v4][v1] == 3 && distTo[v4][v2] == 3 && distTo[v4][v3] == 2 
+	// 										)
+	// 										return true; // PHEW>>>>>>>>
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	// public boolean testForTree_1() 
+	// {
+	// 	boolean present = false;
+
+	// 	for (int v1 = 0; v1 < degree.length; v1++) {
+	// 		if (degree[v1] == majorLabel) {
+	// 			for (int v2 = 0; v2 < degree.length; v2++) {
+	// 				if (degree[v2] == majorLabel && v1 != v2) {
+	// 					for (int v3 = 0; v3 < degree.length; v3++) {
+	// 						if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+	// 							for (int v4 = 0; v4 < degree.length; v4++) {
+	// 								if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+	// 									for (int v5 = 0; v5 < degree.length; v5++) {
+	// 										if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
+	// 											for (int v6 = 0; v6 < degree.length; v6++) {
+	// 												if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
+	// 													// now check the distances... that was absurd... but it guarantees to check all possible majors...
+	// 													if (
+	// 														distTo[v1][v2] == 1 && distTo[v1][v3] == 5 && distTo[v1][v4] == 7 && distTo[v1][v5] == 6 && distTo[v1][v6] == 3 &&
+
+	// 														distTo[v2][v1] == 1 && distTo[v2][v3] == 4 && distTo[v2][v4] == 6 && distTo[v2][v5] == 5 && distTo[v2][v6] == 2 &&
+
+	// 														distTo[v3][v1] == 5 && distTo[v3][v2] == 4 && distTo[v3][v4] == 2 && distTo[v3][v5] == 1 && distTo[v3][v6] == 6 &&
+
+	// 														distTo[v4][v1] == 7 && distTo[v4][v2] == 6 && distTo[v4][v3] == 2 && distTo[v4][v5] == 3 && distTo[v4][v6] == 8 &&
+
+	// 														distTo[v5][v1] == 6 && distTo[v5][v2] == 5 && distTo[v5][v3] == 1 && distTo[v5][v4] == 3 && distTo[v5][v6] == 7 &&
+
+	// 														distTo[v6][v1] == 3 && distTo[v6][v2] == 2 && distTo[v6][v3] == 6 && distTo[v6][v4] == 8 && distTo[v6][v5] == 7 
+	// 														)
+	// 														return true; // PHEW>>>>>>>>
+	// 												}
+	// 											}
+	// 										}
+	// 									}
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return present;
+	// }
+
+	// public boolean testForTree_2() 
+	// {
+	// 	boolean present = false;
+
+	// 	for (int v1 = 0; v1 < degree.length; v1++) {
+	// 		if (degree[v1] == majorLabel) {
+	// 			for (int v2 = 0; v2 < degree.length; v2++) {
+	// 				if (degree[v2] == majorLabel && v1 != v2) {
+	// 					for (int v3 = 0; v3 < degree.length; v3++) {
+	// 						if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+	// 							for (int v4 = 0; v4 < degree.length; v4++) {
+	// 								if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+	// 									for (int v5 = 0; v5 < degree.length; v5++) {
+	// 										if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
+	// 											for (int v6 = 0; v6 < degree.length; v6++) {
+	// 												if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
+	// 													// now check the distances... that was absurd... but it guarantees to check all possible majors...
+	// 													if (
+	// 														distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 7 && distTo[v1][v5] == 8 && distTo[v1][v6] == 10 &&
+
+	// 														distTo[v2][v1] == 2 && distTo[v2][v3] == 1 && distTo[v2][v4] == 5 && distTo[v2][v5] == 6 && distTo[v2][v6] == 8 &&
+
+	// 														distTo[v3][v1] == 3 && distTo[v3][v2] == 1 && distTo[v3][v4] == 4 && distTo[v3][v5] == 5 && distTo[v3][v6] == 7 &&
+
+	// 														distTo[v4][v1] == 7 && distTo[v4][v2] == 5 && distTo[v4][v3] == 4 && distTo[v4][v5] == 1 && distTo[v4][v6] == 3 &&
+
+	// 														distTo[v5][v1] == 8 && distTo[v5][v2] == 6 && distTo[v5][v3] == 5 && distTo[v5][v4] == 1 && distTo[v5][v6] == 2 &&
+
+	// 														distTo[v6][v1] == 10 && distTo[v6][v2] == 8 && distTo[v6][v3] == 7 && distTo[v6][v4] == 3 && distTo[v6][v5] == 2 
+	// 														)
+	// 														return true; // PHEW>>>>>>>>
+	// 												}
+	// 											}
+	// 										}
+	// 									}
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return present;
+	// }
+
+	// public boolean testForTree_3() 
+	// {
+	// 	boolean present = false;
+
+	// 	for (int v1 = 0; v1 < degree.length; v1++) {
+	// 		if (degree[v1] == majorLabel) {
+	// 			for (int v2 = 0; v2 < degree.length; v2++) {
+	// 				if (degree[v2] == majorLabel && v1 != v2) {
+	// 					for (int v3 = 0; v3 < degree.length; v3++) {
+	// 						if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+	// 							for (int v4 = 0; v4 < degree.length; v4++) {
+	// 								if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+	// 									for (int v5 = 0; v5 < degree.length; v5++) {
+	// 										if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
+	// 											//for (int v6 = 0; v6 < degree.length; v6++) {
+	// 											//	if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
+	// 													// now check the distances... that was absurd... but it guarantees to check all possible majors...
+	// 													if (
+	// 														distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 6 && distTo[v1][v5] == 7 && 
+
+	// 														distTo[v2][v1] == 2 && distTo[v2][v3] == 1 && distTo[v2][v4] == 4 && distTo[v2][v5] == 5 && 
+
+	// 														distTo[v3][v1] == 3 && distTo[v3][v2] == 1 && distTo[v3][v4] == 5 && distTo[v3][v5] == 6 && 
+
+	// 														distTo[v4][v1] == 6 && distTo[v4][v2] == 4 && distTo[v4][v3] == 5 && distTo[v4][v5] == 1 && 
+
+	// 														distTo[v5][v1] == 7 && distTo[v5][v2] == 5 && distTo[v5][v3] == 6 && distTo[v5][v4] == 1 
+	// 														)
+	// 														return true; // PHEW>>>>>>>>
+	// 												//}
+	// 											//}
+	// 										}
+	// 									}
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return present;
+	// }
+
+	// public boolean testForTree_4() 
+	// {
+	// 	boolean present = false;
+
+	// 	for (int v1 = 0; v1 < degree.length; v1++) {
+	// 		if (degree[v1] == majorLabel) {
+	// 			for (int v2 = 0; v2 < degree.length; v2++) {
+	// 				if (degree[v2] == majorLabel && v1 != v2) {
+	// 					for (int v3 = 0; v3 < degree.length; v3++) {
+	// 						if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+	// 							for (int v4 = 0; v4 < degree.length; v4++) {
+	// 								if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+	// 									for (int v5 = 0; v5 < degree.length; v5++) {
+	// 										if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
+	// 											for (int v6 = 0; v6 < degree.length; v6++) {
+	// 												if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
+	// 													// now check the distances... that was absurd... but it guarantees to check all possible majors...
+	// 													if (
+	// 														distTo[v1][v2] == 3 && distTo[v1][v3] == 6 && distTo[v1][v4] == 5 && distTo[v1][v5] == 9 && distTo[v1][v6] == 10 &&
+
+	// 														distTo[v2][v1] == 3 && distTo[v2][v3] == 3 && distTo[v2][v4] == 2 && distTo[v2][v5] == 6 && distTo[v2][v6] == 7 &&
+
+	// 														distTo[v3][v1] == 6 && distTo[v3][v2] == 3 && distTo[v3][v4] == 1 && distTo[v3][v5] == 5 && distTo[v3][v6] == 6 &&
+
+	// 														distTo[v4][v1] == 5 && distTo[v4][v2] == 2 && distTo[v4][v3] == 1 && distTo[v4][v5] == 4 && distTo[v4][v6] == 5 &&
+
+	// 														distTo[v5][v1] == 9 && distTo[v5][v2] == 6 && distTo[v5][v3] == 5 && distTo[v5][v4] == 4 && distTo[v5][v6] == 1 &&
+
+	// 														distTo[v6][v1] == 10 && distTo[v6][v2] == 7 && distTo[v6][v3] == 6 && distTo[v6][v4] == 5 && distTo[v6][v5] == 1 
+	// 														)
+	// 														return true; // PHEW>>>>>>>>
+	// 												}
+	// 											}
+	// 										}
+	// 									}
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return present;
+	// }
+
+	// public boolean testForTree_5() 
+	// {
+	// 	boolean present = false;
+
+	// 	for (int v1 = 0; v1 < degree.length; v1++) {
+	// 		if (degree[v1] == majorLabel) {
+	// 			for (int v2 = 0; v2 < degree.length; v2++) {
+	// 				if (degree[v2] == majorLabel && v1 != v2) {
+	// 					for (int v3 = 0; v3 < degree.length; v3++) {
+	// 						if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+	// 							for (int v4 = 0; v4 < degree.length; v4++) {
+	// 								if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+	// 									for (int v5 = 0; v5 < degree.length; v5++) {
+	// 										if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
+	// 											for (int v6 = 0; v6 < degree.length; v6++) {
+	// 												if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
+	// 													// now check the distances... that was absurd... but it guarantees to check all possible majors...
+	// 													if (
+	// 														distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 5 && distTo[v1][v5] == 7 && distTo[v1][v6] == 8 &&
+
+	// 														distTo[v2][v1] == 2 && distTo[v2][v3] == 1 && distTo[v2][v4] == 3 && distTo[v2][v5] == 5 && distTo[v2][v6] == 6 &&
+
+	// 														distTo[v3][v1] == 3 && distTo[v3][v2] == 1 && distTo[v3][v4] == 2 && distTo[v3][v5] == 4 && distTo[v3][v6] == 5 &&
+
+	// 														distTo[v4][v1] == 5 && distTo[v4][v2] == 3 && distTo[v4][v3] == 2 && distTo[v4][v5] == 6 && distTo[v4][v6] == 7 &&
+
+	// 														distTo[v5][v1] == 7 && distTo[v5][v2] == 5 && distTo[v5][v3] == 4 && distTo[v5][v4] == 6 && distTo[v5][v6] == 1 &&
+
+	// 														distTo[v6][v1] == 8 && distTo[v6][v2] == 6 && distTo[v6][v3] == 5 && distTo[v6][v4] == 7 && distTo[v6][v5] == 1 
+	// 														)
+	// 														return true; // PHEW>>>>>>>>
+	// 												}
+	// 											}
+	// 										}
+	// 									}
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return present;
+	// }
+
+	// public boolean testForTree_6() {
+	// 	boolean present = false;
+
+	// 	if (!(majorLabel == 3 || majorLabel == 4)) return false; // we don't expect higher cases
+
+	// 	for (int v1 = 0; v1 < degree.length; v1++) {
+	// 		if (degree[v1] == majorLabel) {
+	// 			for (int v2 = 0; v2 < degree.length; v2++) {
+	// 				if (degree[v2] == majorLabel && v1 != v2) {
+	// 					for (int v3 = 0; v3 < degree.length; v3++) {
+	// 						if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+	// 							for (int v4 = 0; v4 < degree.length; v4++) {
+	// 								if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+	// 									for (int v5 = 0; v5 < degree.length; v5++) {
+	// 										if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
+	// 											// now check the distances... that was absurd... but it guarantees to check all possible majors...
+	// 											if (
+	// 												distTo[v1][v2] == 2 && distTo[v1][v3] == 3 && distTo[v1][v4] == 7 && distTo[v1][v5] == 9 &&
+
+	// 												distTo[v2][v1] == 2 && distTo[v2][v3] == 1 && distTo[v2][v4] == 5 && distTo[v2][v5] == 7 &&
+
+	// 												distTo[v3][v1] == 3 && distTo[v3][v2] == 1 && distTo[v3][v4] == 6 && distTo[v3][v5] == 8 &&
+
+	// 												distTo[v4][v1] == 7 && distTo[v4][v2] == 5 && distTo[v4][v3] == 6 && distTo[v4][v5] == 2 && 
+
+	// 												distTo[v5][v1] == 9 && distTo[v5][v2] == 7 && distTo[v5][v3] == 8 && distTo[v5][v4] == 2																			
+	// 												)
+	// 												return true; // PHEW>>>>>>>>
+	// 										}
+	// 									}
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return present;
+	// }
+
+	// public boolean testForTree_7() {
+	// 	boolean present = false;
+
+	// 	if (!(majorLabel == 3)) return false; // we don't expect higher cases
+
+	// 	for (int v1 = 0; v1 < degree.length; v1++) {
+	// 		if (degree[v1] == majorLabel) {
+	// 			for (int v2 = 0; v2 < degree.length; v2++) {
+	// 				if (degree[v2] == majorLabel && v1 != v2) {
+	// 					for (int v3 = 0; v3 < degree.length; v3++) {
+	// 						if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+	// 							for (int v4 = 0; v4 < degree.length; v4++) {
+	// 								if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+	// 									// now check the distances... that was absurd... but it guarantees to check all possible majors...
+	// 									if (
+	// 										distTo[v1][v2] == 1 && distTo[v1][v3] == 5 && distTo[v1][v4] == 6 && 
+
+	// 										distTo[v2][v1] == 1 && distTo[v2][v3] == 4 && distTo[v2][v4] == 5 && 
+
+	// 										distTo[v3][v1] == 5 && distTo[v3][v2] == 4 && distTo[v3][v4] == 1 && 
+
+	// 										distTo[v4][v1] == 6 && distTo[v4][v2] == 5 && distTo[v4][v3] == 1 
+	// 										)
+	// 										return true; // PHEW>>>>>>>>
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return present;
+	// }
+
+	// public boolean testForTree_8() 
+	// {
+	// 	boolean present = false;
+
+	// 	for (int v1 = 0; v1 < degree.length; v1++) {
+	// 		if (degree[v1] == majorLabel) {
+	// 			for (int v2 = 0; v2 < degree.length; v2++) {
+	// 				if (degree[v2] == majorLabel && v1 != v2) {
+	// 					for (int v3 = 0; v3 < degree.length; v3++) {
+	// 						if (degree[v3] == majorLabel && v3 != v2 && v3 != v1) {
+	// 							for (int v4 = 0; v4 < degree.length; v4++) {
+	// 								if (degree[v4] == majorLabel && v4 != v3 && v4 != v2 && v4 != v1) {
+	// 									for (int v5 = 0; v5 < degree.length; v5++) {
+	// 										if (degree[v5] == majorLabel && v5 != v4 && v5 != v3 && v5 != v2 && v5 != v1) {
+	// 											//for (int v6 = 0; v6 < degree.length; v6++) {
+	// 											//	if (degree[v6] == majorLabel && v6 != v5 && v6 != v4 && v6 != v3 && v6 != v2 && v6 != v1) {
+	// 													// now check the distances... that was absurd... but it guarantees to check all possible majors...
+	// 													if (
+	// 														distTo[v1][v2] == 1 && distTo[v1][v3] == 5 && distTo[v1][v4] == 9 && distTo[v1][v5] == 10 && 
+
+	// 														distTo[v2][v1] == 1 && distTo[v2][v3] == 4 && distTo[v2][v4] == 8 && distTo[v2][v5] == 9 && 
+
+	// 														distTo[v3][v1] == 5 && distTo[v3][v2] == 4 && distTo[v3][v4] == 4 && distTo[v3][v5] == 5 && 
+
+	// 														distTo[v4][v1] == 9 && distTo[v4][v2] == 8 && distTo[v4][v3] == 4 && distTo[v4][v5] == 1 && 
+
+	// 														distTo[v5][v1] == 10 && distTo[v5][v2] == 9 && distTo[v5][v3] == 5 && distTo[v5][v4] == 1 
+	// 														)
+	// 														return true; // PHEW>>>>>>>>
+	// 												//}
+	// 											//}
+	// 										}
+	// 									}
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	return present;
+	// }
 
 // END TEST CASES
 	
@@ -832,57 +674,59 @@ public class TreeChecker
 		return neighbors;
 	}
 
-	public boolean checkForGraphs() {
+	// Try every test case in the paper
+	public boolean checkForGraphs() 
+	{
 		boolean present = false;
-		present = testDeltaMinusOneNeighbors();
+
+		present = test_for_tree_1();
 		if (present) return true;
 
-		present = testDeltaMinusOneNeighbors();
+		present = test_for_tree_2();
 		if (present) return true;
 
-		present = testMajorP3();
+		present = test_for_tree_3();
 		if (present) return true;
 
-		present = testStar();
-		if (present) return true;
+		
 
-		present = testThreeStarD3();
-		if (present) return true;
+		// present = testThreeStarD3();
+		// if (present) return true;
 
-		present = testThreeStarCloseD3();
-		if (present) return true;
+		// present = testThreeStarCloseD3();
+		// if (present) return true;
 
-		present = testConnectedJointStart();
-		if (present) return true;
+		// present = testConnectedJointStart();
+		// if (present) return true;
 
-		present = testTightConnectedJointStart();
-		if (present) return true;
+		// present = testTightConnectedJointStart();
+		// if (present) return true;
 
-		present = testForTree_1(); // WORKS, tested with testForTree_1.amf
-		if (present) return true;
+// 		present = testForTree_1(); // WORKS, tested with testForTree_1.amf
+// 		if (present) return true;
 
-		present = testForTree_2(); // WORKS, tested with testForTree_2.amf
-		if (present) return true;
+// 		present = testForTree_2(); // WORKS, tested with testForTree_2.amf
+// 		if (present) return true;
 
-		present = testForTree_3(); // WORKS, tested with testForTree_3.amf
-		if (present) return true;
+// 		present = testForTree_3(); // WORKS, tested with testForTree_3.amf
+// 		if (present) return true;
 
-		present = testForTree_4(); // WORKS, tested with testForTree_3.amf
-		if (present) return true;
+// 		present = testForTree_4(); // WORKS, tested with testForTree_3.amf
+// 		if (present) return true;
 
-// NO TEST CASES BELOW THIS LINE --- NEED TO WRITE SOME
+// // NO TEST CASES BELOW THIS LINE --- NEED TO WRITE SOME
 
-		present = testForTree_5(); // UNTESTED
-		if (present) return true;
+// 		present = testForTree_5(); // UNTESTED
+// 		if (present) return true;
 
-		present = testForTree_6(); // UNTESTED
-		if (present) return true;
+// 		present = testForTree_6(); // UNTESTED
+// 		if (present) return true;
 
-		present = testForTree_7(); // UNTESTED	
-		if (present) return true;
+// 		present = testForTree_7(); // UNTESTED	
+// 		if (present) return true;
 
-		present = testForTree_8(); // UNTESTED
-		if (present) return true;
+// 		present = testForTree_8(); // UNTESTED
+// 		if (present) return true;
 
 		// TODO: TESTS FOR THE REMAINING CASES
 
@@ -948,8 +792,8 @@ public class TreeChecker
 
 			// present = checker.testDeltaMinusOneNeighbors();
 			// present = checker.testDeltaMinusOneNeighbors();
-			// present = checker.testMajorP3();
-			// present = checker.testStar();
+			// present = checker.test_for_tree_1();
+			// present = checker.test_for_tree_2();
 			// present = checker.testThreeStarD3();
 			// present = checker.testThreeStarCloseD3();
 			// present = checker.testConnectedJointStart();
@@ -961,7 +805,7 @@ public class TreeChecker
 			/*boolean result = checker.testForSubdividedP5();
 			if (result)
 			{
-				result = checker.testMajorP3();
+				result = checker.test_for_tree_1();
 				if (result)
 				{
 					
