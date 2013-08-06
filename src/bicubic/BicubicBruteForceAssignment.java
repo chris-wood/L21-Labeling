@@ -1,10 +1,10 @@
 import java.io.*;
 import java.util.*;
     
-public class BruteForceAssignment
+public class BicubicBruteForceAssignment
 {
     
-	public BruteForceAssignment()
+	public BicubicBruteForceAssignment()
 	{
 	}
 	
@@ -208,7 +208,7 @@ public class BruteForceAssignment
 			}
 		
 			// Run the brute force solver here
-			BruteForceAssignment assigner = new BruteForceAssignment();
+			BicubicBruteForceAssignment assigner = new BicubicBruteForceAssignment();
 			System.out.println(assigner.determineMinLabelSpan(matrix, dimensions));
 			
 		}
