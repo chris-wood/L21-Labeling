@@ -1,9 +1,8 @@
 import java.io.*;
 import java.util.*;
-    
+
 public class BicubicBruteForceAssignment
 {
-    
 	public BicubicBruteForceAssignment()
 	{
 	}
@@ -13,21 +12,7 @@ public class BicubicBruteForceAssignment
 		HashMap<Integer, Integer> labelMap = new HashMap<Integer, Integer>();
 		ArrayList<Integer> labels = new ArrayList<Integer>();
 		ArrayList<Integer> vertices = new ArrayList<Integer>();
-		int maxDegree = 0;
-
-		// Determine max label
-		for (int r = 0; r < size; r++)
-		{
-			int degree = 0;
-			for (int c = 0; c < size; c++)
-			{
-				degree += matrix[r][c];
-			}
-			if (degree > maxDegree)
-			{
-				maxDegree = degree;
-			}
-		}
+		int maxDegree = 15;
         
 		// Create label list to iterate through
 		for (int i = 0; i <= maxDegree + 1; i++)
@@ -43,18 +28,14 @@ public class BicubicBruteForceAssignment
 		}
 		
 		// Invoke the brute force assignment algorithm here
-		if (assignLabel(vertices, 0, labels, matrix, size, labelMap, maxDegree) == true)
-			return 1;
-		else
-			return 2;
+		int span = assignLabel(vertices, 0, labels, matrix, size, labelMap, maxDegree, Integer.MAX_VALUE);
+		return span;
 	}
 
 	// Recursive method that attempts to assign labels to each vertex in the tree using a brute force approach
-	public boolean assignLabel(ArrayList<Integer> vertices, int vertexIndex, ArrayList<Integer> labels, 
-		int matrix[][], int numVertices, HashMap<Integer, Integer> labelMap, int maxDegree)
+	public int assignLabel(ArrayList<Integer> vertices, int vertexIndex, ArrayList<Integer> labels, 
+		int matrix[][], int numVertices, HashMap<Integer, Integer> labelMap, int maxDegree, int span)
 	{
-		boolean d1 = false;
-
 		if ((vertexIndex + 1) == numVertices) // base case
 		{
 			ListIterator<Integer> itr = labels.listIterator();
@@ -65,39 +46,65 @@ public class BicubicBruteForceAssignment
 				
 				// Now check against all vertices (p1s and p2s)
 				boolean valid = checkLabels(matrix, numVertices, vertices, labelMap);
-				int maxLabel = 0;
-				for (Integer lab : labelMap.values())
+                if (valid)
                 {
-                    if (lab > maxLabel)
-                    {
-                        maxLabel = lab;
-                    }
+                	int newSpan = determineSpan(labelMap);
+                	if (newSpan < span && newSpan < 7)
+                	{
+                		return newSpan;
+                	}
+                	else
+                	{
+                		return span;
+                	}
+                	// System.out.println("Valid label span = " + newSpan);
+                	// return newSpan;
                 }
-				// The final check
-				if (valid && (maxLabel - maxDegree) == 1)
-				{
-					System.out.println("D1 found: " + labelMap);
-					return true;
-				}
+                else
+                {
+                	return span;
+                }
 			}
 		}
 		else
 		{
 			// Try all label assignments
 			ListIterator<Integer> itr = labels.listIterator();
+			int minSpan = span;
 			while (itr.hasNext())
 			{
 				int label = itr.next();
 				labelMap.put(vertexIndex, label);
-				d1 = assignLabel(vertices, vertexIndex + 1, labels, matrix, numVertices, labelMap, maxDegree);
-				if (d1 == true)
+				int newSpan = assignLabel(vertices, vertexIndex + 1, labels, matrix, numVertices, labelMap, maxDegree, span);
+				if (newSpan < minSpan)
 				{
-					return true;
+					minSpan = newSpan;
 				}
+			}
+			return minSpan;
+		}
+
+		return span;
+	}
+
+	public int determineSpan(HashMap<Integer, Integer> labelMap)
+	{
+		int minSpan = Integer.MAX_VALUE;
+		int maxSpan = 0;
+		for (Integer v : labelMap.keySet())
+		{
+			int label = labelMap.get(v);
+			if (label > maxSpan)
+			{
+				maxSpan = label;
+			}
+			if (label < minSpan)
+			{
+				minSpan = label;
 			}
 		}
 
-		return d1;
+		return maxSpan - minSpan;
 	}
 
 	public boolean checkLabels(int matrix[][], int size, ArrayList<Integer> vertices, HashMap<Integer, Integer> labelMap)
@@ -138,7 +145,7 @@ public class BicubicBruteForceAssignment
 				break;
 			}
 		}
-				
+		
 		return valid;
 	}
 
