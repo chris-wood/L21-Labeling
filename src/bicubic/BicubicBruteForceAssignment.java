@@ -188,48 +188,62 @@ public class BicubicBruteForceAssignment
 	public static void main(String[] args)
 	{
 		// Check the command line arguments 		
-		if (args.length != 1)
+		if (args.length != 2)
 		{
-			System.err.println("usage: java BruteForceAssignment file");
+			System.err.println("usage: java BruteForceAssignment mode file");
 			return;
 		}
-        
-		// Try to create a buffer reader to parse the adjacency matrix
-		try
+
+		// assigner and mode fetch
+		BicubicBruteForceAssignment assigner = new BicubicBruteForceAssignment();
+		int mode = Integer.parseInt(args[0]);	
+
+		switch (mode)
 		{
-			BufferedReader reader = new BufferedReader(new FileReader(args[0]));
-            
-			// Now, read in the matrix dimensions
-			int dimensions = Integer.parseInt(reader.readLine());
-			int matrix[][] = new int[dimensions][dimensions];
-			
-			// Continue parsing in the rest of the data
-			for (int i = 0; i < dimensions; i++)
-			{
-				String line = reader.readLine();
-				String[] elements = line.split(" ");
-				for (int j = 0; j < dimensions; j++)
+			case 0: // file with adjacency matrix
+				try
 				{
-					matrix[i][j] = Integer.parseInt(elements[j]);
+					BufferedReader reader = new BufferedReader(new FileReader(args[1]));
+		            
+					// Now, read in the matrix dimensions
+					int dimensions = Integer.parseInt(reader.readLine());
+					int matrix[][] = new int[dimensions][dimensions];
+					
+					// Continue parsing in the rest of the data
+					for (int i = 0; i < dimensions; i++)
+					{
+						String line = reader.readLine();
+						String[] elements = line.split(" ");
+						for (int j = 0; j < dimensions; j++)
+						{
+							matrix[i][j] = Integer.parseInt(elements[j]);
+						}
+					}
+				
+					// Run the brute force solver here
+					System.out.println(assigner.determineMinLabelSpan(matrix, dimensions));
+					
 				}
-			}
-		
-			// Run the brute force solver here
-			BicubicBruteForceAssignment assigner = new BicubicBruteForceAssignment();
-			System.out.println(assigner.determineMinLabelSpan(matrix, dimensions));
-			
-		}
-		catch (IndexOutOfBoundsException ex1)
-		{
-			System.err.println("Error parsing adjacency matrix file.");
-		}
-		catch (NumberFormatException ex2)
-		{
-			System.err.println("Error parsing adjacency matrix file.");
-		}
-		catch (IOException ex3)
-		{
-			System.err.println("Error parsing adjacency matrix file.");
+				catch (IndexOutOfBoundsException ex1)
+				{
+					System.err.println("Error parsing adjacency matrix file.");
+				}
+				catch (NumberFormatException ex2)
+				{
+					System.err.println("Error parsing adjacency matrix file.");
+				}
+				catch (IOException ex3)
+				{
+					System.err.println("Error parsing adjacency matrix file.");
+				}
+				break;
+			case 1: // G6 string
+				int matrix[][] = G6Parser.parseG6(args[1]);
+				System.out.println(assigner.determineMinLabelSpan(matrix, matrix.length)); // assumed to be square matrix, derp
+				break;
+			default:
+				System.err.println("Mode: " + mode + " is not supported.");
+				System.exit(-1);
 		}
 	}
 }
