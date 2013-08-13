@@ -30,9 +30,10 @@ else:
 			p = subprocess.Popen('java BicubicBruteForceAssignment 1 ' + g6String, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 			span = ""
 			for line in p.stdout.readlines():
+				print >> sys.stderr, line.strip()
 				try:
 					if len(line) > 0:
-						span = line
+						span = line.strip()
 						break
 				except:
 					raise Exception("Failed on graph: " + str(g6String))
