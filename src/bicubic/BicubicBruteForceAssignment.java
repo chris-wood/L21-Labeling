@@ -12,7 +12,7 @@ public class BicubicBruteForceAssignment
 		HashMap<Integer, Integer> labelMap = new HashMap<Integer, Integer>();
 		ArrayList<Integer> labels = new ArrayList<Integer>();
 		ArrayList<Integer> vertices = new ArrayList<Integer>();
-		int maxDegree = 15;
+		int maxDegree = 10;
         
 		// Create label list to iterate through
 		for (int i = 0; i <= maxDegree + 1; i++)
@@ -29,6 +29,7 @@ public class BicubicBruteForceAssignment
 		
 		// Invoke the brute force assignment algorithm here
 		int span = assignLabel(vertices, 0, labels, matrix, size, labelMap, maxDegree, Integer.MAX_VALUE);
+		span = span == Integer.MAX_VALUE ? -1 : span;
 		return span;
 	}
 
@@ -49,7 +50,7 @@ public class BicubicBruteForceAssignment
                 if (valid)
                 {
                 	int newSpan = determineSpan(labelMap);
-                	if (newSpan < span && newSpan < 7)
+                	if (newSpan < span)
                 	{
                 		return newSpan;
                 	}
