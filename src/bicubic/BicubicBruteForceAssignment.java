@@ -7,12 +7,12 @@ public class BicubicBruteForceAssignment
 	{
 	}
 	
-	public int determineMinLabelSpan(int[][] matrix, int size)
+	public int determineMinLabelSpan(int[][] matrix, int size, int max)
 	{
 		HashMap<Integer, Integer> labelMap = new HashMap<Integer, Integer>();
 		ArrayList<Integer> labels = new ArrayList<Integer>();
 		ArrayList<Integer> vertices = new ArrayList<Integer>();
-		int maxDegree = 10;
+		int maxDegree = max;
         
 		// Create label list to iterate through
 		for (int i = 0; i <= maxDegree + 1; i++)
@@ -186,12 +186,15 @@ public class BicubicBruteForceAssignment
 		return neighbors;
 	}
 	
-	public static void main(String[] args)
+	public static void main(String[] args) throws Exception // I'm just being lazy now...
 	{
 		// Check the command line arguments 		
-		if (args.length != 2)
+		if (args.length != 4)
 		{
-			System.err.println("usage: java BruteForceAssignment mode file");
+			System.err.println("usage: java BruteForceAssignment mode maxLow maxHigh (file|string)");
+			System.err.println("	mode = 0: AMF file");
+			System.err.println("	mode = 1: G6 string");
+			System.err.println("	mode = 2: file of G6 strings");
 			return;
 		}
 
@@ -199,16 +202,25 @@ public class BicubicBruteForceAssignment
 		BicubicBruteForceAssignment assigner = new BicubicBruteForceAssignment();
 		int mode = Integer.parseInt(args[0]);	
 
+		// These two arguments specify the range of labels we should try... 
+		// Performing the exhaustive search for the span grows exponentially as these grow apart.
+		int maxLabelLow = Integer.parseInt(args[1]);
+		int maxLabelHigh = Integer.parseInt(args[2]);
+
+		// Shared....
+		int span = -1;
+		int matrix[][];
+
 		switch (mode)
 		{
 			case 0: // file with adjacency matrix
 				try
 				{
-					BufferedReader reader = new BufferedReader(new FileReader(args[1]));
+					BufferedReader reader = new BufferedReader(new FileReader(args[3]));
 		            
 					// Now, read in the matrix dimensions
 					int dimensions = Integer.parseInt(reader.readLine());
-					int matrix[][] = new int[dimensions][dimensions];
+					matrix = new int[dimensions][dimensions];
 					
 					// Continue parsing in the rest of the data
 					for (int i = 0; i < dimensions; i++)
@@ -222,7 +234,13 @@ public class BicubicBruteForceAssignment
 					}
 				
 					// Run the brute force solver here
-					System.out.println(assigner.determineMinLabelSpan(matrix, dimensions));
+					span = -1;
+					for (int i = maxLabelLow; i <= maxLabelHigh; i++)
+					{
+						span = assigner.determineMinLabelSpan(matrix, dimensions, i); 
+						if (span == -1) break;
+					}
+					System.out.println(span);
 					
 				}
 				catch (IndexOutOfBoundsException ex1)
@@ -239,8 +257,35 @@ public class BicubicBruteForceAssignment
 				}
 				break;
 			case 1: // G6 string
-				int matrix[][] = G6Parser.parseG6(args[1]);
-				System.out.println(assigner.determineMinLabelSpan(matrix, matrix.length)); // assumed to be square matrix, derp
+				matrix = G6Parser.parseG6(args[3]);
+				// System.out.println(assigner.determineMinLabelSpan(matrix, matrix.length, maxLabelLow)); // assumed to be square matrix, derp
+				span = -1;
+				for (int i = maxLabelLow; i <= maxLabelHigh; i++)
+				{
+					span = assigner.determineMinLabelSpan(matrix, matrix.length, i); // assumed to be square matrix, derp	
+					if (span == -1) break;
+				}
+				System.out.println(span);
+				break;
+			case 2: // file of G6 strings
+				BufferedReader reader = new BufferedReader(new FileReader(args[3]));
+				String line = reader.readLine();
+				do
+				{
+					matrix = G6Parser.parseG6(line);
+					span = -1;
+					for (int i = maxLabelLow; i <= maxLabelHigh; i++)
+					{
+						span = assigner.determineMinLabelSpan(matrix, matrix.length, i); // assumed to be square matrix, derp	
+						if (span == -1) break;
+					}
+					System.err.println(line + "," + span);
+					System.out.println(line + "," + span);
+					line = reader.readLine();
+				} while (line != null && line.length() > 0);
+
+				// Close up shop
+				reader.close();
 				break;
 			default:
 				System.err.println("Mode: " + mode + " is not supported.");
