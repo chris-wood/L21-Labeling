@@ -1,3 +1,3 @@
 all:
-	javac *java
+	javac -cp pj.jar:. *java
 

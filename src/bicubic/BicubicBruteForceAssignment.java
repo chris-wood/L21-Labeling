@@ -3,19 +3,23 @@ import java.util.*;
 
 public class BicubicBruteForceAssignment
 {
+
+	static HashMap<Integer, Integer> finalLabelMap = new HashMap<Integer, Integer>();
+
 	public BicubicBruteForceAssignment()
 	{
 	}
 	
 	public int determineMinLabelSpan(int[][] matrix, int size, int max)
 	{
+		finalLabelMap = new HashMap<Integer, Integer>();
 		HashMap<Integer, Integer> labelMap = new HashMap<Integer, Integer>();
 		ArrayList<Integer> labels = new ArrayList<Integer>();
 		ArrayList<Integer> vertices = new ArrayList<Integer>();
 		int maxDegree = max;
         
 		// Create label list to iterate through
-		for (int i = 0; i <= maxDegree + 1; i++)
+		for (int i = 0; i <= maxDegree; i++)
 		{
 			labels.add(i);
 		}
@@ -52,14 +56,17 @@ public class BicubicBruteForceAssignment
                 	int newSpan = determineSpan(labelMap);
                 	if (newSpan < span)
                 	{
+                		finalLabelMap = new HashMap<Integer, Integer>();
+	            		for (Integer v : labelMap.keySet())
+	            		{
+	            			finalLabelMap.put(v, labelMap.get(v));
+	            		}
                 		return newSpan;
                 	}
                 	else
                 	{
                 		return span;
                 	}
-                	// System.out.println("Valid label span = " + newSpan);
-                	// return newSpan;
                 }
                 else
                 {
@@ -114,6 +121,8 @@ public class BicubicBruteForceAssignment
 		HashSet<Integer> onePathNeighbors; 
 		HashSet<Integer> twoPathNeighbors;	
 
+		// if (labelMap.get(0) == 6 && labelMap.get(3) == 6) System.err.println("here");
+
 		ListIterator<Integer> itr = vertices.listIterator();
 		while (itr.hasNext())
 		{
@@ -126,8 +135,8 @@ public class BicubicBruteForceAssignment
             {
                 if (Math.abs(labelMap.get(opn) - labelMap.get(vertex)) < 2)
                 {
-                    valid = false;
-                    break;
+                	// if (labelMap.get(0) == 6 && labelMap.get(3) == 6) System.err.println("false!");
+                    return false;
                 }
             }
             
@@ -136,18 +145,14 @@ public class BicubicBruteForceAssignment
             {
                 if (Math.abs(labelMap.get(tpn) - labelMap.get(vertex)) < 1)
                 {
-                    valid = false;
-                    break;
+                	// if (labelMap.get(0) == 6 && labelMap.get(3) == 6) System.err.println("false!");
+                    return false;
                 }
             }
-
-			if (valid == false)
-			{
-				break;
-			}
 		}
 		
-		return valid;
+		// if (labelMap.get(0) == 6 && labelMap.get(3) == 6) System.err.println("true??!?!?!!");
+		return true;
 	}
 
 	public HashSet<Integer> findOnePathNeighbors(int matrix[][], int dimension, int vertex)
@@ -241,6 +246,7 @@ public class BicubicBruteForceAssignment
 						if (span == -1) break;
 					}
 					System.out.println(span);
+					System.out.println(finalLabelMap);
 					
 				}
 				catch (IndexOutOfBoundsException ex1)
@@ -266,6 +272,7 @@ public class BicubicBruteForceAssignment
 					if (span == -1) break;
 				}
 				System.out.println(span);
+				System.out.println(finalLabelMap);
 				break;
 			case 2: // file of G6 strings
 				BufferedReader reader = new BufferedReader(new FileReader(args[3]));
@@ -280,7 +287,9 @@ public class BicubicBruteForceAssignment
 						if (span == -1) break;
 					}
 					System.err.println(line + "," + span);
+					System.err.println(finalLabelMap);
 					System.out.println(line + "," + span);
+					System.err.println(finalLabelMap);
 					line = reader.readLine();
 				} while (line != null && line.length() > 0);
 

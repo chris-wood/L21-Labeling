@@ -12,7 +12,7 @@ import edu.rit.pj.BarrierAction;
 
 public class ParallelL21Assignment
 {
-
+	static HashMap<Integer, Integer> finalLabelMap = new HashMap<Integer, Integer>();
 	static ParallelTeam team = new ParallelTeam();
 	static ArrayList<Integer> labels;
 	static ArrayList<Integer> vertices;
@@ -29,7 +29,7 @@ public class ParallelL21Assignment
 		final int maxDegree = max;
         
 		// Create label list to iterate through
-		for (int i = 0; i <= maxDegree + 1; i++)
+		for (int i = 0; i <= maxDegree; i++)
 		{
 			labels.add(i);
 		}
@@ -50,6 +50,7 @@ public class ParallelL21Assignment
 				{
 					
 					HashMap<Integer, Integer> labelMap = new HashMap<Integer, Integer>();
+					HashMap<Integer, Integer> localFinalMap = new HashMap<Integer, Integer>();
 					int minSpan = Integer.MAX_VALUE;
 
 					public IntegerSchedule schedule()
@@ -64,6 +65,7 @@ public class ParallelL21Assignment
 						for (int i = 0; i < size; i++)
 						{
 							labelMap.put(i, -1);
+							localFinalMap.put(i, -1);
 						}
 					}
 
@@ -76,7 +78,7 @@ public class ParallelL21Assignment
 							{
 								int label = labels.get(t_ii);
 								labelMap.put(0, label);
-								int newSpan = assignLabel(vertices, 1, labels, matrix, size, labelMap, maxDegree, minSpan);
+								int newSpan = assignLabel(vertices, 1, labels, matrix, size, labelMap, localFinalMap, maxDegree, minSpan);
 								if (newSpan < minSpan && newSpan != Integer.MAX_VALUE)
 								{
 									minSpan = newSpan;
@@ -92,6 +94,11 @@ public class ParallelL21Assignment
 					{
 						if (minSpan < span.get())
 						{
+							finalLabelMap = new HashMap<Integer, Integer>();
+		            		for (Integer v : localFinalMap.keySet())
+		            		{
+		            			finalLabelMap.put(v, localFinalMap.get(v));
+		            		}
 							span.set(minSpan);
 						}
 					}
@@ -107,7 +114,7 @@ public class ParallelL21Assignment
 
 	// Recursive method that attempts to assign labels to each vertex in the tree using a brute force approach
 	public int assignLabel(ArrayList<Integer> vertices, int vertexIndex, ArrayList<Integer> labels, 
-		int matrix[][], int numVertices, HashMap<Integer, Integer> labelMap, int maxDegree, int span)
+		int matrix[][], int numVertices, HashMap<Integer, Integer> labelMap, HashMap<Integer, Integer> localFinalMap, int maxDegree, int span)
 	{
 		if ((vertexIndex + 1) == numVertices) // base case
 		{
@@ -124,6 +131,10 @@ public class ParallelL21Assignment
                 	int newSpan = determineSpan(labelMap);
                 	if (newSpan < span)
                 	{
+	            		for (Integer v : labelMap.keySet())
+	            		{
+	            			localFinalMap.put(v, labelMap.get(v));
+	            		}
                 		return newSpan;
                 	}
                 	else
@@ -148,7 +159,7 @@ public class ParallelL21Assignment
 			{
 				int label = itr.next();
 				labelMap.put(vertexIndex, label);
-				int newSpan = assignLabel(vertices, vertexIndex + 1, labels, matrix, numVertices, labelMap, maxDegree, span);
+				int newSpan = assignLabel(vertices, vertexIndex + 1, labels, matrix, numVertices, labelMap, localFinalMap, maxDegree, span);
 				if (newSpan < minSpan)
 				{
 					minSpan = newSpan;
@@ -315,7 +326,7 @@ public class ParallelL21Assignment
 						if (span == -1) break;
 					}
 					System.out.println(span);
-					
+					System.out.println(finalLabelMap);
 				}
 				catch (IndexOutOfBoundsException ex1)
 				{
@@ -340,6 +351,7 @@ public class ParallelL21Assignment
 					if (span == -1) break;
 				}
 				System.out.println(span);
+				System.out.println(finalLabelMap);
 				break;
 			case 2: // file of G6 strings
 				BufferedReader reader = new BufferedReader(new FileReader(args[3]));
@@ -354,7 +366,8 @@ public class ParallelL21Assignment
 						if (span == -1) break;
 					}
 					System.err.println(line + "," + span);
-					System.out.println(line + "," + span);
+					System.err.println(finalLabelMap);
+					System.out.println(line + "," + span + "," + finalLabelMap.toString());
 					line = reader.readLine();
 				} while (line != null && line.length() > 0);
 
