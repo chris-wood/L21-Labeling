@@ -61,6 +61,10 @@ public class BicubicBruteForceAssignment
 	            		{
 	            			finalLabelMap.put(v, labelMap.get(v));
 	            		}
+	            		if (newSpan == 5)
+	            		{
+	            			System.out.println(finalLabelMap.toString());
+	            		}
                 		return newSpan;
                 	}
                 	else
