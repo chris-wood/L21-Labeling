@@ -51,6 +51,7 @@ public class ParallelL21Assignment
 					
 					HashMap<Integer, Integer> labelMap = new HashMap<Integer, Integer>();
 					HashMap<Integer, Integer> localFinalMap = new HashMap<Integer, Integer>();
+					HashMap<Integer, Integer> localScratchMap = new HashMap<Integer, Integer>();
 					int minSpan = Integer.MAX_VALUE;
 
 					public IntegerSchedule schedule()
@@ -82,6 +83,16 @@ public class ParallelL21Assignment
 								if (newSpan < minSpan && newSpan != Integer.MAX_VALUE)
 								{
 									minSpan = newSpan;
+									localScratchMap = new HashMap<Integer, Integer>();
+									for (Integer v : localFinalMap.keySet())
+									{
+										localScratchMap.put(v, localFinalMap.get(v));
+									}
+									// if (newSpan == 5) 
+									// {
+									// 	System.err.println(localScratchMap.toString());
+									// 	System.exit(-1);
+									// }
 									// System.out.println("New span: " + minSpan);
 								}
 							}
@@ -92,15 +103,12 @@ public class ParallelL21Assignment
 
 					public void finish()
 					{
-						if (minSpan < span.get())
-						{
-							finalLabelMap = new HashMap<Integer, Integer>();
-		            		for (Integer v : localFinalMap.keySet())
-		            		{
-		            			finalLabelMap.put(v, localFinalMap.get(v));
-		            		}
-							span.set(minSpan);
-						}
+						// if (minSpan < span.get())
+						// {
+						// 	updateLabelMap(localFinalMap);
+						// 	span.set(minSpan);
+						// }
+						updateLabelMap(minSpan, localScratchMap);
 					}
 				});
 			}
@@ -110,6 +118,19 @@ public class ParallelL21Assignment
 		// int span = assignLabel(vertices, 0, labels, matrix, size, labelMap, maxDegree, Integer.MAX_VALUE);
 		// span = span == Integer.MAX_VALUE ? -1 : span;
 		return span.get();
+	}
+
+	public synchronized void updateLabelMap(int minSpan, HashMap<Integer, Integer> localScratchMap)
+	{
+		if (minSpan < span.get())
+		{
+			finalLabelMap = new HashMap<Integer, Integer>();
+			for (Integer v : localScratchMap.keySet())
+			{
+				finalLabelMap.put(v, localScratchMap.get(v));
+			}
+			span.set(minSpan);
+		}
 	}
 
 	// Recursive method that attempts to assign labels to each vertex in the tree using a brute force approach
@@ -159,7 +180,7 @@ public class ParallelL21Assignment
 			{
 				int label = itr.next();
 				labelMap.put(vertexIndex, label);
-				int newSpan = assignLabel(vertices, vertexIndex + 1, labels, matrix, numVertices, labelMap, localFinalMap, maxDegree, span);
+				int newSpan = assignLabel(vertices, vertexIndex + 1, labels, matrix, numVertices, labelMap, localFinalMap, maxDegree, minSpan);
 				if (newSpan < minSpan)
 				{
 					minSpan = newSpan;
