@@ -3,7 +3,7 @@ import random
 from sage.all import *
 import sage.graphs.graph_plot
 
-def build_graph(lines, n, k):
+def build_graph_from_asc(lines, n, k):
 	''' Build the adjacency matrix and SAGE graph from the adjacency list
 	format of the graph contained in the lines list.
 	'''
@@ -21,6 +21,9 @@ def build_graph(lines, n, k):
 	M = Matrix(rows)
 	G = Graph(M)
 	return G
+
+def build_graph_from_scd(n, k):
+	raise Exception("TODO")
 
 def parse_params(fname):
 	''' Retrieve n and k from the file name.
@@ -47,7 +50,7 @@ def build_graph_from_asc_file(fname):
 		print(line)
 		if "Graph" in line and first == False:
 			block = True
-			graphs.append(build_graph(lines, n, k))
+			graphs.append(build_graph_from_asc(lines, n, k))
 			lines = []
 		elif "Graph" in line:
 			first = False
@@ -55,8 +58,23 @@ def build_graph_from_asc_file(fname):
 			block = False
 		elif len(line) > 0 and block:
 			lines.append(line)
-	graphs.append(build_graph(lines, n, k))
+	graphs.append(build_graph_from_asc(lines, n, k))
 	return graphs
+
+def build_graph_from_scd_file(fname):
+		''' Parse the parameters for the set of graphs in this file from the given
+	values of n and k.
+	'''
+	# Parse the params
+	n, k = parse_params(fname)
+
+	f = open(fname, 'r')
+	lines = []
+	graphs = []
+
+	# TODO
+
+	return graphs	
 
 def main():
 	fname = sys.argv[1]
