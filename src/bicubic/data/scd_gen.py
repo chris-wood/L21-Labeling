@@ -3,6 +3,7 @@ import subprocess
 import os
 import shutil
 import glob
+from parse_asc import *
 
 if (len(sys.argv) != 2):
 	print "Usage: python scnGen.py fileWithFileNames"
@@ -12,27 +13,10 @@ else:
 	# Grab all files...
 	for fname in f:
 		fname = fname.strip()
+		n, k = parse_params(fname)
+		print >> sys.stderr, "Running: " + fname
 
-
-	fileList = open('files', 'r')
-	while True:
-		# Get the extension and check it
-		file = fileList.readline().rstrip('\n')
-		fileName, fileExtension = os.path.splitext(file)
-		if (fileExtension == '.amf'):
-		
-			# Run the L21 algorithm on all samples
-			print "running " + file
-			p = subprocess.Popen('java ' + alg + ' ' + samples + '/' + file, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-			delta1 = False
-			for line in p.stdout.readlines():
-				try:
-					print(line)
-					if ("true" in line):
-						delta1 = True
-						print "delta+1"
-					else:
-						print "delta+2"
-				except:
-					print "uhoh"
-					raise Exception("Failed on file: " + str(file))
+		p = subprocess.Popen('./readscd ' + str(n) + ' ' + str(k), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+		for line in p.stdout.readlines():
+			line = line.strip()
+			print line
