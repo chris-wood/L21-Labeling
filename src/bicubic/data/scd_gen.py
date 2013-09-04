@@ -17,6 +17,10 @@ else:
 		print >> sys.stderr, "Running: " + fname
 
 		p = subprocess.Popen('./readscd ' + str(n) + ' ' + str(k), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+		lines = []
 		for line in p.stdout.readlines():
 			line = line.strip()
-			print line
+			lines.append(line)
+		fout = open(fname + ".asc", 'w')
+		for line in lines:
+			fout.write(line + "\n")
