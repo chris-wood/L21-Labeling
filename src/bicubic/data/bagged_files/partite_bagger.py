@@ -14,8 +14,8 @@ for fname in filesIn:
 	index = 0
 	for G in graphs:
 		# Save a picture of the graph so this can be checked!
-		P = G.plot()
-		P.save(prefix + "_" + str(index) + ".png")
+		# P = G.plot()
+		# P.save(prefix + "_" + str(index) + ".png")
 		t = G.chromatic_number()
 
 		# Update the map
