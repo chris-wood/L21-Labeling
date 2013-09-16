@@ -43,21 +43,40 @@ char *code,**l;
 void nachblist(l)
 char **l;
 {
- char i,j;
- for(i=1;i<=n;i++)
+ char i,j,index,hit;
+
+ for (i=1;i <= n; i++)
+ {
+  for (j=1;j<=n; j++)
+  {
+   hit = 0;
+    for(index=1;index<=k; index++)
     {
-     printf("\n%d : ",i);
-     for(j=1;j<=k;j++)
-	 printf("%d ",l[i][j]);
+      if (l[i][index] == j) 
+      {
+       printf("1 ");
+       hit = 1;
+      }
     }
- printf("\n");
+    if (hit == 0) printf("0 ");
+  }
+  printf("\n");
+ }
+
+// for(i=1;i<=n;i++)
+//    {
+//     printf("\n%d : ",i);
+//     for(j=1;j<=k;j++)
+//	 printf("%d ",l[i][j]);
+//    }
+// printf("\n");
 }
 
 main(argc,argv)
 int  argc;
 char **argv;
 {
- int i,j,erg;
+ int i,j,erg,matCount;
  char *code,**nlist,scd[20];
  long anz=0;
  FILE* scdfile;
@@ -70,6 +89,7 @@ char **argv;
 
  n=(char)atoi(*++argv);
  k=(char)atoi(*++argv);
+ matCount = 0;
  argc-=2;
 
  if(argc>1)
@@ -93,7 +113,8 @@ char **argv;
 
  while((erg=dekomp(scdfile,code))!=0)
       {
-       printf("\n%d. Graph gelesen\n",++anz);
+ //      printf("\n%d. Graph gelesen\n",++anz);
+       printf("%d\n", matCount++);
        codetonlist(code,nlist);
        nachblist(nlist);
       }
@@ -106,5 +127,4 @@ char **argv;
 
  return(1);
 }
-
 
