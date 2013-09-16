@@ -1,0 +1,54 @@
+import sys
+import random
+from sage.all import *
+
+# Parse a file containing a list of adjacency matrices and output the corresponding G6 strings...
+# This uses Sage to do G6 parsing
+# Run: sage -python parse_asc_to_g6.py asc_file
+
+def build_graphs_from_asc_file(fname, n, k):
+	f = open(fname, 'r')
+	lines = []
+	first = True
+	block = True
+	graphs = []
+	
+	# Parse each one!
+	line = ""
+	line = f.readline().strip()
+	while len(line) > 0:
+		index = int(line)
+		rows = []
+		for i in range(n):
+			line = f.readline().strip()
+			entries = line.split(" ")
+			row = []
+			for e in entries:
+				e = int(e)
+				row.append(e)
+			rows.append(row)
+		M = Matrix(rows)
+		G = Graph(M)
+		graphs.append(G)
+	return graphs
+	
+def parse_params(fname):
+	''' Retrieve n and k from the file name.
+	'''
+	params = fname.split("_")
+	n = int(params[0])
+	k = int(params[1])
+	return n, k
+
+def main():
+	
+	fname = sys.argv[1]
+	n, k = parse_params(fname)
+	graphs = build_graphs_from_asc_file(fname, n, k)
+	
+	# Write the g6 string format to stdout, nothing fancy...
+	for g in graphs:
+		print(g.graph6_string())
+
+if __name__ == "__main__":
+	main()
