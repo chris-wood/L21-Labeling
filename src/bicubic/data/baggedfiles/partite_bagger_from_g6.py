@@ -1,6 +1,5 @@
-from sage import *
-from parse_asc import *
 import sys
+from sage.all import *
 
 # Partite bagger from G6 string input (REQUIRES SAGE!)
 # Run: sage -python partite_bagger_from_g6.py g6file
@@ -28,7 +27,8 @@ for fname in filesIn:
 	graphs = []
 	for g6str in f:
 		g6str = g6str.strip()
-		G = Graph(g6str)
+		print >> sys.stderr, "Read G6: " + str(g6str)
+		G = Graph("" + str(g6str))
 		graphs.append(G)
 	
 	partite_bags = {}
