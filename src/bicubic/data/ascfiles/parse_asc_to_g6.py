@@ -42,14 +42,19 @@ def parse_params(fname):
 	return n, k
 
 def main():
-	
 	fname = sys.argv[1]
-	n, k = parse_params(fname)
-	graphs = build_graphs_from_asc_file(fname, n, k)
+	filesin = open(fname, 'r')
+	for filename in filesin:
+		filename = filename.strip()
+		print >> sys.stderr, "Parsing: " + str(filename)
+		n, k = parse_params(filename)
+		graphs = build_graphs_from_asc_file(filename, n, k)
 	
-	# Write the g6 string format to stdout, nothing fancy...
-	for g in graphs:
-		print(g.graph6_string())
+		# Write the g6 string format to stdout, nothing fancy...
+		outfile = open(filename + ".g6", 'w')
+		for g in graphs:
+			outfile.write(g.graph6_string() + "\n")
+			#print(g.graph6_string())
 
 if __name__ == "__main__":
 	main()
