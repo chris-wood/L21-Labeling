@@ -29,17 +29,17 @@ else:
 	line = f.readline().strip()
 	while len(line) > 0:
 		fname = line
+		print >> sys.stderr, "Running: " + fname
 		line = f.readline().strip()
 		n, k = parse_params(fname)
 		low, high = parse_bounds(line)
 		line = f.readline().strip()
-		print >> sys.stderr, "Running: " + fname
 
 		p = subprocess.Popen('java -classpath pj.jar:. ParallelL21Assignment 2 ' + str(low) + ' ' + str(high) + " " + fname, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		lines = []
-		for line in p.stdout.readlines():
-			line = line.strip()
-			lines.append(line)
+		for l in p.stdout.readlines():
+			l = l.strip()
+			lines.append(l)
 		fout = open(fname + ".span", 'w')
-		for line in lines:
-			fout.write(line + "\n")
+		for l in lines:
+			fout.write(l + "\n")
