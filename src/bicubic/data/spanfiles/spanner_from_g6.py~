@@ -42,6 +42,4 @@ else:
 			lines.append(l)
 		fout = open(fname + ".span", 'w')
 		for l in lines:
-			print >> sys.stderr, l
-			print(l)
 			fout.write(l + "\n")
