@@ -30,10 +30,10 @@ else:
 	
 	# Grab all files...
 	inputf = open(inputfn, 'r')
-	l = f.readline().strip()
+	l = inputf.readline().strip()
 	while len(l) > 0:
 		g6 = l
-		l = f.readline().strip()
+		l = inputf.readline().strip()
 		result = l
 
 		# Only run verifier on trees that are shown to have a span of delta+2
@@ -56,5 +56,5 @@ else:
 				failf.write(g6 + "\n")
 
 		# Advance to the next graph...
-		l = f.readline().strip()
+		l = inputf.readline().strip()
 
