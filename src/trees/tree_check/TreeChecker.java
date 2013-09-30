@@ -521,9 +521,9 @@ public class TreeChecker
 	public static void main(String[] args)
 	{
 		// Check the command line arguments 		
-		if (args.length != 1)
+		if (args.length != 2)
 		{
-			System.err.println("usage: java TreeChecker file");
+			System.err.println("usage: java TreeChecker mode file");
 			return;
 		}
 
@@ -540,45 +540,56 @@ public class TreeChecker
 		TreeChecker check = new TreeChecker(testMatrix, 6);
 		HashSet<Integer> fours = check.findNeighbors(0, 4);
 
-		// Try to create a buffer reader to parse the adjacency matrix
-		try
+		int mode = Integer.parseInt(args[0]);
+		if (mode == 0)
 		{
-			BufferedReader reader = new BufferedReader(new FileReader(args[0]));
-            
-			// Now, read in the matrix dimensions
-			int dimensions = Integer.parseInt(reader.readLine());
-			int matrix[][] = new int[dimensions][dimensions];
-			
-			// Continue parsing in the rest of the data
-			for (int i = 0; i < dimensions; i++)
+			// Try to create a buffer reader to parse the adjacency matrix
+			try
 			{
-				String line = reader.readLine();
-				String[] elements = line.split(" ");
-				for (int j = 0; j < dimensions; j++)
+				BufferedReader reader = new BufferedReader(new FileReader(args[1]));
+            
+				// Now, read in the matrix dimensions
+				int dimensions = Integer.parseInt(reader.readLine());
+				int matrix[][] = new int[dimensions][dimensions];
+			
+				// Continue parsing in the rest of the data
+				for (int i = 0; i < dimensions; i++)
 				{
-					matrix[i][j] = Integer.parseInt(elements[j]);
+					String line = reader.readLine();
+					String[] elements = line.split(" ");
+					for (int j = 0; j < dimensions; j++)
+					{
+						matrix[i][j] = Integer.parseInt(elements[j]);
+					}
 				}
-			}
 		
-			// Run the property checkers here
-			TreeChecker checker = new TreeChecker(matrix, dimensions);
+				// Run the property checkers here
+				TreeChecker checker = new TreeChecker(matrix, dimensions);
+				boolean present = checker.checkForGraphs();
+				System.out.println(present);
+			}
+			catch (IndexOutOfBoundsException ex1)
+			{
+				System.err.println("Error parsing adjacency matrix file.");
+				ex1.printStackTrace();
+			}
+			catch (NumberFormatException ex2)
+			{
+				System.err.println("Error parsing adjacency matrix file.");
+				ex2.printStackTrace();
+			}
+			catch (IOException ex3)
+			{
+				System.err.println("Error parsing adjacency matrix file.");
+				ex3.printStackTrace();
+			}
+		}
+		else if (mode == 1)
+		{
+			int[][] matrix = G6Parser.parseG6(args[1]);
+			TreeChecker checker = new TreeChecker(matrix, matrix.length);
 			boolean present = checker.checkForGraphs();
 			System.out.println(present);
-		}
-		catch (IndexOutOfBoundsException ex1)
-		{
-			System.err.println("Error parsing adjacency matrix file.");
-			ex1.printStackTrace();
-		}
-		catch (NumberFormatException ex2)
-		{
-			System.err.println("Error parsing adjacency matrix file.");
-			ex2.printStackTrace();
-		}
-		catch (IOException ex3)
-		{
-			System.err.println("Error parsing adjacency matrix file.");
-			ex3.printStackTrace();
 		}
 	}
 }

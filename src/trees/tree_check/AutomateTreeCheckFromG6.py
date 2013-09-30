@@ -40,11 +40,11 @@ else:
 		if ("false" in result):
 			print >> sys.stderr, "Running: " + g6
 			p = subprocess.Popen('java TreeChecker 1 ' + g6, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-			testPass = True
+			testPass = False
 			for line in p.stdout.readlines():
 				try:
 					if "true" in line:
-						testPass = False
+						testPass = True
 				except:
 					raise Exception("Something went wrong with graph: " + g6)
 
