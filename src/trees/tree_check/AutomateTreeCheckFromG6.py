@@ -40,18 +40,20 @@ else:
 		if ("false" in result):
 			print >> sys.stderr, "Running: " + g6
 			p = subprocess.Popen('java TreeChecker 1 ' + g6, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-			testPass = False
+			contains = False
 			for line in p.stdout.readlines():
 				try:
-					if "true" in line:
-						testPass = True
+					print >> sys.stderr, "Out: " + line
+					if "true" in line: # true means that it contained a forbidden subtree
+						contains = True
 				except:
 					raise Exception("Something went wrong with graph: " + g6)
 
-			if testPass:
+			if contains:
 				print >> sys.stderr, "Passed: contained one of the subtrees"
 				passf.write(g6 + "\n")
 			else:
+				print >> sys.stdout, "Failure case: " + g6
 				print >> sys.stderr, "Failed: did not contain one of the subtrees"
 				failf.write(g6 + "\n")
 
