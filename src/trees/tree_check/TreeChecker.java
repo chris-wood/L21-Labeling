@@ -3,6 +3,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Scanner;
+import java.io.File;
 
 public class TreeChecker 
 {
@@ -518,7 +520,7 @@ public class TreeChecker
 	 * Main entry point of program
 	 * @param args
 	 */
-	public static void main(String[] args)
+	public static void main(String[] args) throws Exception
 	{
 		// Check the command line arguments 		
 		if (args.length != 2)
@@ -587,6 +589,20 @@ public class TreeChecker
 		else if (mode == 1)
 		{
 			int[][] matrix = G6Parser.parseG6(args[1]);
+			TreeChecker checker = new TreeChecker(matrix, matrix.length);
+			boolean present = checker.checkForGraphs();
+			System.out.println(present);
+		}
+		else if (mode == 2)
+		{
+			System.err.println("Reading: " + args[1]);
+			String g6 = "";
+			Scanner scan = new Scanner(new File(args[1]));
+			while (scan.hasNextLine()) {
+				g6 = g6 + scan.nextLine();
+			}
+			System.err.println("Parsing: " + g6);
+			int[][] matrix = G6Parser.parseG6(g6);
 			TreeChecker checker = new TreeChecker(matrix, matrix.length);
 			boolean present = checker.checkForGraphs();
 			System.out.println(present);
