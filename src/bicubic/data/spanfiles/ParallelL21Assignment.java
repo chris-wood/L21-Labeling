@@ -6,6 +6,7 @@ import edu.rit.pj.ParallelRegion;
 import edu.rit.pj.ParallelTeam;
 import edu.rit.pj.reduction.SharedLong;
 import edu.rit.pj.reduction.SharedInteger;
+import edu.rit.pj.reduction.SharedBoolean;
 import edu.rit.pj.reduction.IntegerOp;
 import edu.rit.pj.Comm;
 import edu.rit.pj.BarrierAction;
@@ -17,6 +18,8 @@ public class ParallelL21Assignment
 	static ArrayList<Integer> labels;
 	static ArrayList<Integer> vertices;
 	static SharedInteger span;
+	// static SharedBoolean done;
+	// static int graphMaxDegree;
 
 	public ParallelL21Assignment()
 	{
@@ -27,6 +30,8 @@ public class ParallelL21Assignment
 		labels = new ArrayList<Integer>();
 		vertices = new ArrayList<Integer>();
 		final int maxDegree = max;
+		// done = new SharedBoolean(false);
+		// graphMaxDegree = max + 2;
         
 		// Create label list to iterate through
 		for (int i = 0; i <= maxDegree; i++)
@@ -130,6 +135,11 @@ public class ParallelL21Assignment
 				finalLabelMap.put(v, localScratchMap.get(v));
 			}
 			span.set(minSpan);
+
+			// if (minSpan == graphMinimumSpan)
+			// {
+			// 	done.set(true);
+			// }
 		}
 	}
 
