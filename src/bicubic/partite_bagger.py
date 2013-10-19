@@ -17,6 +17,7 @@ for fname in filesIn:
 		# P = G.plot()
 		# P.save(prefix + "_" + str(index) + ".png")
 		t = G.chromatic_number()
+		print >> sys.stderr, str(prefix) + " (" + str(index) + "): " + str(t)
 
 		# Update the map
 		if not (t in partite_bags):
