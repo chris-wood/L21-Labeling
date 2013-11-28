@@ -13,7 +13,7 @@ import shutil
 import glob
 
 print >> sys.stderr, len(sys.argv)
-if (len(sys.argv) != 3):
+if (len(sys.argv) != 4):
 	print "Usage: python AutomateLabel.py alg fileOfFiles file?"
 else:
 	alg = sys.argv[1]
